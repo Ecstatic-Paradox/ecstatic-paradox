@@ -36,7 +36,29 @@ Homepage contains basic introductory stuffs [EDIT THIS]
 ### 8. Dashboard
 
 ## Backend
+**Dependencies** 
+  - Django
+  - django_rest_framework
+  - djangorestframework-simplejwt
+
+### Models Overview
+**NOTE: Use CamelCase for model name and snake_case for fields name**
+  + **`django.contrib.auth.models.User`**
+    Used for the mainly for authentication purposes, OnetoOne extended with `Profile` model. Stores 
+    - First Name
+    - Last Name
+    - Username
+    - Email
+    - Password
+  + **`Profile`**
+    Stores additional informations about individual members mainly to be viewes in member profile:
+     - Picture
+     - Facebook Profile
+     - 
+
 ### Authentication System
-Authentication System is handled with JWT Tokens.
+Authentication System is handled with JWT Tokens.  
+**Model:** `django.contrib.auth.models.User`
+
 
 
