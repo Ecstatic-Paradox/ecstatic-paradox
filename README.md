@@ -40,6 +40,7 @@ Homepage contains basic introductory stuffs [EDIT THIS]
   - Django
   - django_rest_framework
   - djangorestframework-simplejwt
+  - wagtail cms
 
 ### Models Overview
 **NOTE: Use CamelCase for model name and snake_case for fields name**
@@ -54,11 +55,30 @@ Homepage contains basic introductory stuffs [EDIT THIS]
     Stores additional informations about individual members mainly to be viewes in member profile:
      - Picture
      - Facebook Profile
-     - 
+     - LinkedIn Profile
+     - Country
+     - Department
+     - Spectrum `ManytoMany field with **Spectrum** model`
+  + **`Attendence`**
+    - Date
+    - Member `Foreign Key of **User** model`
+    - Status `Boolean either Attended or On Leave`
+    - Remarks 
+
+    
 
 ### Authentication System
-Authentication System is handled with JWT Tokens.  
++ Authentication System is handled with JWT Tokens.  
 **Model:** `django.contrib.auth.models.User`
++ Regiatration of users will be manually done by administration.
++ Refresh Token (15 days Valid) as HttpOnly Cookie and Access Token as Json will be provided on authentication.  
++ Authorizations will be given by dividing the users into specific permission groups.
+  - Superuser
+  - General member
+  - HR .. etc [needs discussion]() 
 
 
-
+### Attendence System
+  - Only HR will have permission to mark members on leave.
+  - List of members whose record isnot obtained for specific day(neither attended nor on leave) will be provided to HR on need. 
+ 
