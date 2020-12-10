@@ -109,7 +109,7 @@ Homepage contains basic introductory stuffs [EDIT THIS]
 ### Authentication System
 **Model:** `django.contrib.auth.models.User`
 + Authentication System is handled with JWT Tokens.  
-+ Regiatration of users will be manually done by administration.
++ Registration of users will be manually verified by administration.
 + Refresh Token (15 days Valid) as HttpOnly Cookie and Access Token as Json will be provided on authentication.  
 + Authorizations will be given by dividing the users into specific permission groups.
   - Superuser
@@ -119,7 +119,7 @@ Homepage contains basic introductory stuffs [EDIT THIS]
 
 ### Attendence System
 **Model:** `Attendance`
-  - A attendance link will be created everyday at 9pm. It's validity and expiration will be ensured using stateless JWT token.
+  - Attendance will be opened by HR(probably everyday at 9pm). It's validity and expiration will be ensured using stateless JWT token.
   - Those member who fill out the form will have record on Attendance table with status True.
   - Those members who are on leave should ask HR for leave. Only HR will have permission to mark members on leave with additional Remarks(Reason for leave).
   - List of members whose record isnot obtained on **Attendence** table for specific date(status neither attended(True) nor on leave(False)) will be provided to HR on need after 10pm of that day.
