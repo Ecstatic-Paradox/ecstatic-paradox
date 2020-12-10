@@ -54,19 +54,50 @@ Homepage contains basic introductory stuffs [EDIT THIS]
   + **`Profile`**
     Stores additional informations about individual members mainly to be viewes in member profile:
      - Picture
+     - Contact Number
+     - Institution
      - Facebook Profile
      - LinkedIn Profile
      - Country
+     - Address
      - Department
      - Spectrum `ManytoMany field with **Spectrum** model`
-  + **`Attendence`**
+     - Additional Information `Bio type discription to show on Member Profile`
+  + **`Attendance`**
     - Date
     - Member `Foreign Key of **User** model`
-    - Status `Boolean either Attended or On Leave`
-    - Remarks 
-
+    - Status `Boolean either Attended(True) or On Leave(False)`
+    - Remarks `Information about why the person was on leave`
+  + **`Absentee` **
+    Stores the reasons for being absent of absentee member.
+    - Date `Date the person was absent`
+    - Member
+    - Remarks
+  + **`Notice` **
+   - Date
+   - Issuer `Foreign Key with` **`django.contrib.auth.models.User`**
+   - Description
+   - Attachment
+   - Is Pinned
+   - Expiry DateTime
+   - Is expired `Boolean`
+  + **`Project` **
+  Only Certain Group will have authorization to add Project
+    - Title
+    - Overview `Short Paragraph info about Project`
+    - Start Date
+    - End Date
+    - Thumbnail `Image Field`
+    - Description `Complete Detail About Project`
+    - Is Highlighted
+    - Is Completed
+  + **`Meeting` **
+    - Date
+    - Title
+    - Duration
+    - Overview
+    - Minute
     
-
 ### Authentication System
 + Authentication System is handled with JWT Tokens.  
 **Model:** `django.contrib.auth.models.User`
