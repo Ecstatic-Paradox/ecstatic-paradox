@@ -68,12 +68,12 @@ Homepage contains basic introductory stuffs [EDIT THIS]
     - Member `Foreign Key of **User** model`
     - Status `Boolean either Attended(True) or On Leave(False)`
     - Remarks `Information about why the person was on leave`
-  + **`Absentee` **
+  + **`Absentee`**
     Stores the reasons for being absent of absentee member.
     - Date `Date the person was absent`
     - Member
     - Remarks
-  + **`Notice` **
+  + **`Notice`**
    - Date
    - Issuer `Foreign Key with` **`django.contrib.auth.models.User`**
    - Description
@@ -81,7 +81,7 @@ Homepage contains basic introductory stuffs [EDIT THIS]
    - Is Pinned
    - Expiry DateTime
    - Is expired `Boolean`
-  + **`Project` **
+  + **`Project`**
   Only Certain Group will have authorization to add Project
     - Title
     - Overview `Short Paragraph info about Project`
@@ -91,13 +91,15 @@ Homepage contains basic introductory stuffs [EDIT THIS]
     - Description `Complete Detail About Project`
     - Is Highlighted
     - Is Completed
-  + **`Meeting` **
+  + **`Meeting`**
+  Stores meeting minute.
     - Date
     - Title
     - Duration
     - Overview
     - Minute
-  + **`Document` **
+  + **`Document`**
+  stores company documents.
     - Title
     - Date
     - Type
