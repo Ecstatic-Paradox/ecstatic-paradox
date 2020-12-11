@@ -74,13 +74,13 @@ Homepage contains basic introductory stuffs [EDIT THIS]
     - Member
     - Remarks
   + **`Notice`**
-   - Date
-   - Issuer `Foreign Key with` **`django.contrib.auth.models.User`**
-   - Description
-   - Attachment
-   - Is Pinned
-   - Expiry DateTime
-   - Is expired `Boolean`
+    - Date
+    - Issuer `Foreign Key with` **`django.contrib.auth.models.User`**
+    - Description
+    - Attachment
+    - Is Pinned
+    - Expiry DateTime
+    - Is expired `Boolean`
   + **`Project`**
   Only Certain Group will have authorization to add Project
     - Title
@@ -99,12 +99,25 @@ Homepage contains basic introductory stuffs [EDIT THIS]
     - Overview
     - Minute
   + **`Document`**
-  stores company documents.
+  Stores company documents.
     - Title
     - Date
     - Type
     - Overview
     - Attachment
+ + **`Article`**
+    - Title
+    - Author
+    - Date Published
+    - Is Published
+    - Content
+ + **`Blog`**
+    - Title
+    - Author
+    - Date Published
+    - Is Published
+    - Content
+ 
     
 ### Authentication System
 **Model:** `django.contrib.auth.models.User`
