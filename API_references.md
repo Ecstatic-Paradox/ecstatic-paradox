@@ -1,4 +1,4 @@
-# API Refrences
+# API References
 
 ### /api/register
 **Allowed Methods:** `POST`   
