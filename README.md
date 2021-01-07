@@ -7,12 +7,22 @@ This document is created for the aid of any developer who may join during the de
 
 ## Setup Process
 
+Can be configured for local development easily via Docker.
+
 **Requirements**
   - Docker
   - docker-compose
   
 **Commands**
-`docker-compose up`
+`docker-compose up --build`
+Then Check https://localhost .  
+If docker is not available, then Pipenv can be used.
+**Requirements**
+  - pip3
+  - pipenv `Can be installed by pip install pipenv`
+
+**Commands**
+Run `pipenv install --dev` to install dependencies then run `pipenv run python manage.py migrate` to migrate local database, then run `pipenv run python manage.py runserver` to run the localserver.
 
 ## Frontend
 
