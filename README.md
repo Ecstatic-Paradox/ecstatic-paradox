@@ -49,8 +49,7 @@ Homepage contains basic introductory stuffs [EDIT THIS]
 **Dependencies** 
   - Django
   - django_rest_framework
-  - djangorestframework-simplejwt
-  - wagtail cms
+  - wagtail
 
 ### Models Overview
 **NOTE: Use CamelCase for model name and snake_case for fields name**
@@ -127,8 +126,20 @@ Homepage contains basic introductory stuffs [EDIT THIS]
     - Date Published
     - Is Published
     - Content
+ + **`Webinar`** **`Symposium`** **`Talk Shows`** **`Conference`**
+  - Title
+  - Description
+  - Thumbnail
+  - Youtube_link
+  - Registration_form
+ + **`Research Paper`**
+    - Title
+    - Author
+    - Date Published
+    - Is Published
+    - Content 
  
-    
+ 
 ### Authentication System
 **Model:** `django.contrib.auth.models.User`
 + Registration of users will be manually verified by administration.  
