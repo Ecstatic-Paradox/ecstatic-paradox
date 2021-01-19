@@ -69,17 +69,23 @@ Homepage contains basic introductory stuffs [EDIT THIS]
      - LinkedIn Profile
      - Country
      - Address
-     - Department
+     - Department 
      - Spectrum `ManytoMany field with **Spectrum** model`
-     - Additional Information `Bio type discription to show on Member Profile`
-  + **`Attendance`**
+     - Additional Information `Bio type discription to show on Member Profile`  
+     User must have profile to use dashboard, so if logged in user has to profile then, they are redirected to profile create page. 
+  + **`Attendance Issue`**
+    To store on which days HR opened attendance.
     - Date
+    - issuer `HR who opened attendance that day`
+    - remarks
+  + **`Attendance`**
+    - issue `Foreign Key of **Attendace Issue** `
     - Member `Foreign Key of **User** model`
     - Status `Boolean either Attended(True) or On Leave(False)`
     - Remarks `Information about why the person was on leave`
   + **`Absentee`**
     Stores the reasons for being absent of absentee member.
-    - Date `Date the person was absent`
+    - issue `Date the person was absent, Foreign Key of Attendance Issue Model`
     - Member
     - Remarks
   + **`Notice`**
@@ -114,24 +120,28 @@ Homepage contains basic introductory stuffs [EDIT THIS]
     - Type
     - Overview
     - Attachment
- + **`Article`**
+
++ **`Article`**
+    - Title
+    - Author `Many to Many Relationship with User Model`
+    - Content
+    - Section
+    Content streamfield should have sections, figures
++ **`Blog`**
     - Title
     - Author
-    - Date Published
-    - Is Published
     - Content
- + **`Blog`**
-    - Title
-    - Author
-    - Date Published
-    - Is Published
-    - Content
- + **`Webinar`** **`Symposium`** **`Talk Shows`** **`Conference`**
+    - Feed_image
+    - Section
+    Content Streamfield should have heading, para, media, `Quote` 
++ **`Webinar`** **`Symposium`** **`Talk Shows`** **`Conference`**
   - Title
   - Description
   - Thumbnail
   - Youtube_link
   - Registration_form
+  
+  
  + **`Research Paper`**
     - Title
     - Author
@@ -142,21 +152,17 @@ Homepage contains basic introductory stuffs [EDIT THIS]
  
 ### Authentication System
 **Model:** `django.contrib.auth.models.User`
-+ Registration of users will be manually verified by administration.  
-+ Authorizations will be given by dividing the users into specific permission groups.
-  - Superuser
-  - General member
-  - HR .. etc [needs discussion]() 
++ Default Wagtail Auth System.
 
 
 ### Attendence System
 **Model:** `Attendance`
-  - Attendance will be opened by HR(probably everyday at 9pm)..
+  - Attendance will be opened by HR(probably everyday at 9pm) (Automation is also possible).
   - Those member who fill out the form will have record on Attendance table with status True.
   - Those members who are on leave should ask HR for leave. Only HR will have permission to mark members on leave with additional Remarks(Reason for leave).
   - List of members whose record isnot obtained on **Attendence** table for specific date(status neither attended(True) nor on leave(False)) will be provided to HR on need after 10pm of that day.
   - HR will have permission to add member as leave or to send the absentee member link to ask for reason.
   - Information About absentee member will be stored in **Absentee** Table.
-  - HR can view remarks from **Absentee** Table 
+  - Remarks from **Absentee** Table will be public.
  
 ### 
