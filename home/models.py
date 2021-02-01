@@ -1,6 +1,6 @@
 from django.db import models
-
-from modelcluster.fields import ParentalKey
+from django import forms
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from wagtail.admin.edit_handlers import (
     FieldPanel,
     InlinePanel,
@@ -16,9 +16,12 @@ from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.search import index
 from wagtail.embeds.blocks import EmbedBlock
 from django.contrib.auth.models import User
+
 import datetime
+from wagtail.snippets.models import register_snippet
 class HomePage(Page):
     pass
+
 
 class AttendanceIssue(models.Model):
     """ Record which days attendance was opened by HR"""
@@ -124,6 +127,7 @@ class Article(Page):
         null=True,
         blank=True,
     )
+    sections = ParentalManyToManyField('home.PublicationSection', blank=True)
     # Search index configuration
 
     search_fields = Page.search_fields + [
@@ -138,8 +142,41 @@ class Article(Page):
         FieldPanel("date_published"),
         # FieldPanel("author"),
         StreamFieldPanel("content", classname="full"),
+        FieldPanel('sections', widget=forms.CheckboxSelectMultiple),
     ]
     parent_page_types = ["home.HomePage"]
     @property
     def author(self):
         return self.owner.get_full_name()
+
+
+
+# ---------------------Categories
+class CustomSection(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, max_length=80)
+
+    panels = [
+        FieldPanel('name'),
+        FieldPanel('slug'),
+    ]
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Section"
+        verbose_name_plural = "Sections"
+
+@register_snippet
+class ProgramSection(CustomSection):
+    pass
+@register_snippet
+class PublicationSection(CustomSection):
+    pass
+@register_snippet
+class CourseSection(CustomSection):
+    pass
+@register_snippet
+class ProjectSection(CustomSection):
+    pass
