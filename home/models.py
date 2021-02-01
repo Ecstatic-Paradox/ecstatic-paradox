@@ -25,6 +25,9 @@ class AttendanceIssue(models.Model):
     date = models.DateField(unique=True)
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     remarks = models.TextField(null=True)
+
+    def __str__(self):
+        return str(self.date)
     #--------------------Add validation for the User (must be HR)
 
 class Attendance(models.Model):
@@ -33,7 +36,6 @@ class Attendance(models.Model):
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.BooleanField()
     remarks = models.TextField(null=True)
-
 
 class Absentee(models.Model):
     """Record list of reasons absentees(without informing HR)"""
@@ -51,15 +53,33 @@ class Profile(models.Model):
 
     @property
     def is_attended_today(self):
+        # return False
+        try:
+            today_attendance_issue = AttendanceIssue.objects.get(date=datetime.date.today())
+        except Exception:
+            return False
         return bool(
             Attendance.objects.filter(
-                issue_date=AttendanceIssue.objects.get(date=datetime.date.today()), member=self.user
+                issue_date=today_attendance_issue, member=self.user
             ).count()
         )
 
 
 
+class Webinar(models.Model):
+    date_added = models.DateField(auto_now_add=True)
+    date=models.DateField()
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    thumbnail = models.ImageField(upload_to="webinar_thumbnails")
+    youtube_link = models.TextField()
+    registration_form = models.TextField()
 
+class ResearchPaper(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.CharField(max_length=50)
+    date_published = models.DateField()
+    
 class Notice(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     issuer = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -119,7 +139,7 @@ class Article(Page):
         # FieldPanel("author"),
         StreamFieldPanel("content", classname="full"),
     ]
-
+    parent_page_types = ["home.HomePage"]
     @property
     def author(self):
         return self.owner.get_full_name()

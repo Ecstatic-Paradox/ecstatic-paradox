@@ -4,6 +4,7 @@ import datetime
 from django.shortcuts import redirect
 
 class TodayAttendance(TemplateView):
+    """Handle Requests for attendance"""
     template_name = "today_attendance.html"
 
     def post(self, request, **args):
