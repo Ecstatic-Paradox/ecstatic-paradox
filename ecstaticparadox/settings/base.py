@@ -38,8 +38,10 @@ INSTALLED_APPS = [
     'wagtail.search',
     'wagtail.admin',
     'wagtail.core',
+
     'wagtail.contrib.modeladmin',
     'wagtail.contrib.styleguide',
+
     'modelcluster',
     'taggit',
 
@@ -115,6 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'home.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

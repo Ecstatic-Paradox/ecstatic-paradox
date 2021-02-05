@@ -36,7 +36,7 @@ class TodayAttendanceMenuItem(MenuItem):
     """ Show Today's Attendance Menu option only if user isnot attended and attendance is issued that day"""
 
     def is_shown(self, request):
-        return ((not request.user.profile.is_attended_today) and bool(AttendanceIssue.objects.filter(date=datetime.date.today()).count()))
+        return ((not request.user.is_attended_today) and bool(AttendanceIssue.objects.filter(date=datetime.date.today()).count()))
 
 
 @hooks.register("register_admin_menu_item")

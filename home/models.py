@@ -1,5 +1,10 @@
-from django.db import models
 from django import forms
+from django.db import models
+from django.apps import apps
+from django.contrib.auth.models import AbstractUser
+
+from wagtail.core.models import Page
+
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from wagtail.admin.edit_handlers import (
     FieldPanel,
@@ -15,12 +20,39 @@ from wagtail.images.blocks import ImageChooserBlock
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.search import index
 from wagtail.embeds.blocks import EmbedBlock
-from django.contrib.auth.models import User
+from wagtail.snippets.models import register_snippet
 
 import datetime
-from wagtail.snippets.models import register_snippet
+
 class HomePage(Page):
     pass
+
+class User(AbstractUser):
+    """ Store General information about user and also handle auth."""
+    country = models.CharField(max_length=20)
+    address = models.CharField(max_length=20, blank=True, null=True)
+    contact = models.CharField(max_length=20)
+
+    @property
+    def is_attended_today(self):
+        AttendanceIssue = apps.get_model(app_label='home', model_name='AttendanceIssue')
+        Attendance = apps.get_model(app_label='home', model_name='Attendance')
+        try:
+            today_attendance_issue = AttendanceIssue.objects.get(date=datetime.date.today())
+        except Exception:
+            return False
+        return bool(
+            Attendance.objects.filter(
+                issue_date=today_attendance_issue, member=self.user
+            ).count()
+        )
+    
+#     # def unrecorded_leave(self):
+#     #     AttendanceIssue = apps.get_model(app_label='home', model_name='AttendanceIssue')
+#     #     Attendance = apps.get_model(app_label='home', model_name='Attendance')
+#     #     Absentee = apps.get_model(app_label='home', model_name='Absentee')
+
+#     #     if AttendanceIssue
 
 
 class AttendanceIssue(models.Model):
@@ -31,7 +63,7 @@ class AttendanceIssue(models.Model):
 
     def __str__(self):
         return str(self.date)
-    #--------------------Add validation for the User (must be HR)
+    #To do-->Add validation for the User (must be HR)
 
 class Attendance(models.Model):
     """Record attendance of each day"""
@@ -46,26 +78,6 @@ class Absentee(models.Model):
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     remarks = models.TextField()
 
-
-class Profile(models.Model):
-    """ Store additional information about member, to be viewed in member profile """
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    country = models.CharField(max_length=20)
-    address = models.CharField(max_length=20, blank=True, null=True)
-    contact = models.CharField(max_length=20)
-
-    @property
-    def is_attended_today(self):
-        # return False
-        try:
-            today_attendance_issue = AttendanceIssue.objects.get(date=datetime.date.today())
-        except Exception:
-            return False
-        return bool(
-            Attendance.objects.filter(
-                issue_date=today_attendance_issue, member=self.user
-            ).count()
-        )
 
 
 

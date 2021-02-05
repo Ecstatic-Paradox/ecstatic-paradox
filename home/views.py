@@ -9,7 +9,7 @@ class TodayAttendance(TemplateView):
 
     def post(self, request, **args):
         try:
-            if request.user and (not request.user.profile.is_attended_today):
+            if request.user and (not request.user.is_attended_today):
                 Attendance.objects.create(
                 member=request.user, issue_date=AttendanceIssue.objects.get(date=datetime.date.today()), status=True,
             )
