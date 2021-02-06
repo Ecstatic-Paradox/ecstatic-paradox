@@ -32,7 +32,11 @@ class User(AbstractUser):
     country = models.CharField(max_length=20)
     address = models.CharField(max_length=20, blank=True, null=True)
     contact = models.CharField(max_length=20)
-
+    user_department = models.ForeignKey('home.Department', on_delete=models.SET_NULL, null=True, blank=True)
+    institution = models.CharField(max_length=1000, blank=True, null=True)
+    fb_profile_link = models.CharField(max_length=1000, blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
+    
     @property
     def is_attended_today(self):
         AttendanceIssue = apps.get_model(app_label='home', model_name='AttendanceIssue')
@@ -43,7 +47,7 @@ class User(AbstractUser):
             return False
         return bool(
             Attendance.objects.filter(
-                issue_date=today_attendance_issue, member=self.user
+                issue_date=today_attendance_issue, member=self
             ).count()
         )
     
@@ -54,7 +58,14 @@ class User(AbstractUser):
 
 #     #     if AttendanceIssue
 
+@register_snippet
+class Department(models.Model):
+    department_title = models.CharField(max_length=30)
+    hod = models.ForeignKey('home.User', on_delete=models.SET_NULL, blank=True, null=True)
 
+    def __str__(self):
+        return self.department_title
+        
 class AttendanceIssue(models.Model):
     """ Record which days attendance was opened by HR"""
     date = models.DateField(unique=True)

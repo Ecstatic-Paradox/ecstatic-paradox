@@ -164,3 +164,10 @@ WAGTAIL_SITE_NAME = "ecstaticparadox"
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
 BASE_URL = 'http://example.com'
+
+
+WAGTAIL_USER_EDIT_FORM = 'home.forms.CustomUserEditForm'
+WAGTAIL_USER_CREATION_FORM = 'home.forms.CustomUserCreationForm'
+WAGTAIL_USER_CUSTOM_FIELDS = ['country',
+                              'address', 'contact', 'user_department', 'institution', 'fb_profile_link', 'bio',
+                              ]
