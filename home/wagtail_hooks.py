@@ -18,7 +18,7 @@ import datetime
 @hooks.register("construct_main_menu")
 def main_menu_edit(request, menu_items):
     """Remove Pages option from dashboard menu"""
-    menu_items[:] = [i for i in menu_items if (i.label not in ["Pages"])]
+    # menu_items[:] = [i for i in menu_items if (i.label not in ["Pages"])]
     pass
 
 
