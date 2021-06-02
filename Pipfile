@@ -4,11 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-wagtail = "*"
 gunicorn = "*"
+wagtail = "*"
 
 [dev-packages]
 pylint = "*"
+black = "*"
 
 [requires]
 python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true
