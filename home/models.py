@@ -1,3 +1,4 @@
+# from typing_extensions import Required
 from django import forms
 from django.db import models
 from django.apps import apps
@@ -21,7 +22,7 @@ from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.search import index
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.snippets.models import register_snippet
-
+from wagtail.admin.forms import WagtailAdminPageForm
 import datetime
 
 
@@ -242,3 +243,15 @@ class CourseSection(CustomSection):
 @register_snippet
 class ProjectSection(CustomSection):
     pass
+
+
+@register_snippet
+class Notification(models.Model):
+    date_added = models.DateTimeField(auto_now=True)
+    title = models.CharField(max_length=128)
+    message = models.TextField()
+    has_expired = models.BooleanField(default=False)
+    expiry_date = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self) -> str:
+        return self.title

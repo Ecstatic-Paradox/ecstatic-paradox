@@ -1,0 +1,8 @@
+<section class="content">
+{% if notifications %}
+    <h1> Notices </h1>
+    {% for notification in notifications %}
+        <h3> {{ notification.title }}</h3>
+    {% endfor %}
+{% endif %}
+</section>

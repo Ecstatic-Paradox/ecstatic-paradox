@@ -1,5 +1,10 @@
+import django
 from django.urls import reverse
 from django.urls import path, reverse
+from django.utils.safestring import mark_safe
+from django.utils.html import format_html
+from django.templatetags.static import static
+from django.template.loader import render_to_string
 
 from wagtail.core import hooks
 from wagtail.admin.menu import MenuItem
@@ -8,7 +13,7 @@ from wagtail.contrib.modeladmin.options import (
     modeladmin_register,
     ModelAdminGroup,
 )
-
+from wagtail.admin.site_summary import SiteSummaryPanel
 
 from .views import TodayAttendance
 from .models import (
@@ -19,17 +24,36 @@ from .models import (
     Webinar,
     ResearchPaper,
     Project,
+    Notification,
 )
 import datetime
 
-from django.utils.html import format_html
-from django.templatetags.static import static
+# Add notifications page in Dashboard Home
+class NotificationPanel:
+
+    order = 50
+
+    def __init__(self, request):
+        self.request = request
+
+    def render(self):
+        return render_to_string(
+            "home/home_notifications.html",
+            {"notifications": Notification.objects.all()},
+            request=self.request,
+        )
 
 
-#Colors Change in Dashboard
-@hooks.register('insert_global_admin_css')
+@hooks.register("construct_homepage_panels")
+def add_notifications_panel(request, panels):
+    panels.pop(0)  # Remove the site_summary ie. Image 2, Docs 4 blah blah
+    panels.append(NotificationPanel(request))
+
+
+# Colors Change in Dashboard
+@hooks.register("insert_global_admin_css")
 def global_admin_css():
-    return format_html('<link rel="stylesheet" href="{}">', static('css/colors.css'))
+    return format_html('<link rel="stylesheet" href="{}">', static("css/colors.css"))
 
 
 @hooks.register("construct_main_menu")
