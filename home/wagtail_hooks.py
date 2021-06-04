@@ -1,11 +1,12 @@
-import django
 from django.urls import reverse
 from django.urls import path, reverse
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.templatetags.static import static
 from django.template.loader import render_to_string
+from django.db.models import Q
 
+from wagtail.admin.views.account import BaseSettingsPanel
 from wagtail.core import hooks
 from wagtail.admin.menu import MenuItem
 from wagtail.contrib.modeladmin.options import (
@@ -26,7 +27,20 @@ from .models import (
     Project,
     Notification,
 )
+from .forms import CustomProfileSettingsForm
+
 import datetime
+
+
+# Customize account settings
+@hooks.register("register_account_settings_panel")
+class CustomSettingsPanel(BaseSettingsPanel):
+    name = "profile"
+    title = "My profile"
+    order = 290
+    form_class = CustomProfileSettingsForm
+    form_object = "user"
+
 
 # Add notifications page in Dashboard Home
 class NotificationPanel:
@@ -37,9 +51,30 @@ class NotificationPanel:
         self.request = request
 
     def render(self):
+        unexpired = Notification.objects.filter(has_expired=False).filter(
+            Q(expiry_date__gte=datetime.datetime.now()) | Q(expiry_date=None)
+        )
+        expired_bool = Notification.objects.filter(has_expired=True)
+        expired = (
+            Notification.objects.filter(expiry_date__lte=datetime.datetime.now())
+            .union(expired_bool)
+            .order_by("-date_added")
+        )
+
+        if unexpired.count() == 0 and expired.count() == 0:
+            return render_to_string(
+                "home/home_notifications.html",
+                {"notifications": False},
+                request=self.request,
+            )
+
         return render_to_string(
             "home/home_notifications.html",
-            {"notifications": Notification.objects.all()},
+            {
+                "notifications": True,
+                "unexpired_notifications": unexpired,
+                "expired_notifications": expired,
+            },
             request=self.request,
         )
 

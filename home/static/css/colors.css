@@ -7,3 +7,11 @@
   /* --color-input-focus: rgb(204, 0, 102); */
   --color-input-focus-border: #0060c7;
 }
+
+/* It was about colors but soory */
+.avatar img {
+  position: relative;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}

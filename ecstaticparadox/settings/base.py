@@ -167,6 +167,7 @@ WAGTAIL_USER_CUSTOM_FIELDS = [
     "country",
     "address",
     "contact",
+    "date_of_birth",
     "user_department",
     "institution",
     "fb_profile_link",

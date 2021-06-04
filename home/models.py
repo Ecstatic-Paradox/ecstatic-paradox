@@ -42,7 +42,10 @@ class User(AbstractUser):
     institution = models.CharField(max_length=1000, blank=True, null=True)
     fb_profile_link = models.CharField(max_length=1000, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
 
+
+# Also update at settings and forms html
     @property
     def is_attended_today(self):
         AttendanceIssue = apps.get_model(app_label="home", model_name="AttendanceIssue")

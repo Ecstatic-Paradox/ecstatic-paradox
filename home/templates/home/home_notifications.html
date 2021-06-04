@@ -1,8 +1,58 @@
-<section class="content">
-{% if notifications %}
-    <h1> Notices </h1>
-    {% for notification in notifications %}
-        <h3> {{ notification.title }}</h3>
+<section class="nice-padding">
+  {% if notifications %}
+  <div>
+    <strong>
+      <h1 style="font-weight: bold">Notices</h1>
+    </strong>
+  </div>
+
+  <div class="ep_notifications_container">
+    {% for notification in unexpired_notifications %}
+    <div class="ep_unexpired_notification ep_notification">
+      <p class="ep_notification_title">{{ notification.title }}</p>
+      <p class="ep_notification_message">{{ notification.message }}</p>
+      <h5>**on air</h5>
+    </div>
+    {% endfor %} {% for notification in expired_notifications %}
+    <div class="ep_expired_notification ep_notification">
+      <p class="ep_notification_title">{{ notification.title }}</p>
+      <p class="ep_notification_message">{{ notification.message }}</p>
+      <h5>**expired</h5>
+    </div>
     {% endfor %}
-{% endif %}
+  </div>
+  {% endif %}
 </section>
+
+<style>
+  .ep_notifications_container {
+    display: flex;
+    padding: 20px;
+    flex-flow: row;
+    flex-wrap: wrap;
+  }
+  .ep_notification {
+    color: black;
+    padding: 10px 10px 2px 20px;
+    border-radius: 4px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    max-height: max-content;
+    min-height: 50px;
+    min-width: 150px;
+    max-width: 350px;
+    text-overflow: ellipsis;
+  }
+  .ep_notification_title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .ep_unexpired_notification {
+    background-color: #26dba8cc;
+    border-color: #12a078;
+  }
+  .ep_expired_notification {
+    background-color: #e96569ee;
+    border-color: #dd272d;
+  }
+</style>
