@@ -44,8 +44,7 @@ class User(AbstractUser):
     bio = models.TextField(blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
 
-
-# Also update at settings and forms html
+    # Also update at settings and forms html
     @property
     def is_attended_today(self):
         AttendanceIssue = apps.get_model(app_label="home", model_name="AttendanceIssue")
@@ -187,6 +186,13 @@ class Article(Page):
         blank=True,
     )
     sections = ParentalManyToManyField("home.PublicationSection", blank=True)
+    # API configuration
+    api_fields = [
+        APIField("date_published"),
+        APIField("content"),
+        APIField("sections"),
+        APIField("author"),
+    ]
     # Search index configuration
 
     search_fields = Page.search_fields + [
