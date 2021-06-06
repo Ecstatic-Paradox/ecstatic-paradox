@@ -116,9 +116,9 @@ class TodayAttendanceMenuItem(MenuItem):
     """Show Today's Attendance Menu option only if user isnot attended and attendance is issued that day"""
 
     def is_shown(self, request):
-        return (not request.user.is_attended_today) and bool(
-            AttendanceIssue.objects.filter(date=datetime.date.today()).count()
-        )
+        return ((not request.user.is_attended_today) and bool(
+            AttendanceIssue.objects.filter(is_open=True).count()
+        ))
 
 
 @hooks.register("register_admin_menu_item")
@@ -193,8 +193,8 @@ class AttendanceIssueAdmin(ModelAdmin):
     add_to_settings_menu = False
     exclude_from_explorer = False
     list_display = ("date",)
-    list_filter = ("date", "member")
-    search_fields = ("issue_date", "remarks")
+    list_filter = ("date", )
+    search_fields = ("date", "remarks")
 
 
 class AttendanceAdminGroup(ModelAdminGroup):

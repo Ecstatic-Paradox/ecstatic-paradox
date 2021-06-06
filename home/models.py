@@ -51,7 +51,7 @@ class User(AbstractUser):
         Attendance = apps.get_model(app_label="home", model_name="Attendance")
         try:
             today_attendance_issue = AttendanceIssue.objects.get(
-                date=datetime.date.today()
+                date__lte=datetime.date.today(), is_open=True
             )
         except Exception:
             return False
@@ -61,14 +61,11 @@ class User(AbstractUser):
             ).count()
         )
 
+    @property
+    def has_unrecorded_leave(self):
+        Absentee = apps.get_model(app_label='home', model_name='Absentee')
 
-#     # def unrecorded_leave(self):
-#     #     AttendanceIssue = apps.get_model(app_label='home', model_name='AttendanceIssue')
-#     #     Attendance = apps.get_model(app_label='home', model_name='Attendance')
-#     #     Absentee = apps.get_model(app_label='home', model_name='Absentee')
-
-#     #     if AttendanceIssue
-
+        return bool(Absentee.objects.filter(member=self).filter(remarks='').count())
 
 @register_snippet
 class Department(models.Model):
@@ -84,12 +81,26 @@ class Department(models.Model):
 class AttendanceIssue(models.Model):
     """Record which days attendance was opened by HR"""
 
-    date = models.DateField(unique=True)
-    member = models.ForeignKey(User, on_delete=models.CASCADE)
-    remarks = models.TextField(null=True)
+    date = models.DateTimeField(unique=True)
+    remarks = models.TextField(blank=True, null=True)
+    is_open = models.BooleanField(default=True)
+
+    def save(self, *args, **kwrgs):
+        if AttendanceIssue.objects.filter(is_open=True).count() != 0:
+            return 
+        else:
+            super().save(*args, **kwrgs)
+
 
     def __str__(self):
         return str(self.date)
+
+    @property
+    def get_absentee_list(self):
+        Attendance = apps.get_model(app_label="home", model_name="Attendance")
+        return User.objects.exclude(attendance_set__in = Attendance.objects.filter(issue_date=self))
+
+
 
     # To do-->Add validation for the User (must be HR)
 
@@ -99,8 +110,8 @@ class Attendance(models.Model):
 
     issue_date = models.ForeignKey(AttendanceIssue, on_delete=models.CASCADE)
     member = models.ForeignKey(User, on_delete=models.CASCADE)
-    status = models.BooleanField()
-    remarks = models.TextField(null=True)
+    status = models.BooleanField(default=True)
+    remarks = models.TextField(blank=True,null=True)
 
 
 class Absentee(models.Model):
@@ -108,7 +119,7 @@ class Absentee(models.Model):
 
     issue_date = models.ForeignKey(AttendanceIssue, on_delete=models.CASCADE)
     member = models.ForeignKey(User, on_delete=models.CASCADE)
-    remarks = models.TextField()
+    remarks = models.TextField(null=True, blank=True)
 
 
 class Webinar(models.Model):
