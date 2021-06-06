@@ -19,3 +19,8 @@
 .object > .title-wrapper {
   background: #bed7f5 !important;
 }
+
+.nav-submenu__footer
+{
+  display:none;
+}
