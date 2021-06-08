@@ -1,10 +1,10 @@
 from django.urls import reverse
 from django.urls import path, reverse
-from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.templatetags.static import static
 from django.template.loader import render_to_string
 from django.db.models import Q
+from django.http.response import HttpResponseRedirect
 
 from wagtail.admin.views.account import BaseSettingsPanel
 from wagtail.core import hooks
@@ -14,14 +14,16 @@ from wagtail.contrib.modeladmin.options import (
     modeladmin_register,
     ModelAdminGroup,
 )
-from wagtail.admin.site_summary import SiteSummaryPanel
 
-from .views import TodayAttendance
+
+from .views import TodayAttendance, AttendanceIssueInspect
 from .models import (
     Attendance,
+    Course,
     HomePage,
     AttendanceIssue,
     Article,
+    Symposium,
     Webinar,
     ResearchPaper,
     Project,
@@ -100,6 +102,8 @@ def main_menu_edit(request, menu_items):
         )
         HomePage.save(mainpage)
     menu_items[:] = [i for i in menu_items if (i.label not in ["Pages"])]
+    
+    return HttpResponseRedirect('/today-attendance')
     pass
 
 
@@ -107,7 +111,8 @@ def main_menu_edit(request, menu_items):
 hooks.register(
     "register_admin_urls",
     lambda: [
-        path("today-attendance/", TodayAttendance.as_view(), name="today-attendance")
+        path("today-attendance/", TodayAttendance.as_view(), name="today-attendance"),
+
     ],
 )
 
@@ -185,6 +190,7 @@ class AttendanceAdmin(ModelAdmin):
     search_fields = ("member", "remarks")
 
 
+
 class AttendanceIssueAdmin(ModelAdmin):
     model = AttendanceIssue
     menu_label = "Issue Attendance"
@@ -195,6 +201,10 @@ class AttendanceIssueAdmin(ModelAdmin):
     list_display = ("date",)
     list_filter = ("date", )
     search_fields = ("date", "remarks")
+    inspect_view_enabled=True
+    inspect_view_class = AttendanceIssueInspect
+    inspect_view_fields = ['date', 'remarks', 'is_open', ]
+    # inspect_template_name = 'attendance_issue_inspect.html'
 
 
 class AttendanceAdminGroup(ModelAdminGroup):
@@ -215,12 +225,20 @@ class WebinarAdmin(ModelAdmin):
     list_filter = ("date_added",)
     search_fields = ("title", "description")
 
+class SymposiumAdmin(ModelAdmin):
+    model = Symposium
+    menu_label = "Symposium"
+    menu_icon = "pilcrow"
+    list_display = ("title", "date")
+    list_filter = ("date_added",)
+    search_fields = ("title", "description")
+
 
 class ProgramsAdminGroup(ModelAdminGroup):
     menu_icon = "folder-inverse"
     menu_label = "Programs"
     menu_order = 700
-    items = (WebinarAdmin,)
+    items = (WebinarAdmin,SymposiumAdmin)
 
 
 modeladmin_register(ProgramsAdminGroup)
@@ -240,3 +258,18 @@ class ProjectAdmin(ModelAdmin):
 
 
 modeladmin_register(ProjectAdmin)
+
+class CourseAdmin(ModelAdmin):
+    model = Course
+    menu_icon = "folder-inverse"
+    menu_label = "Courses"
+    menu_order = 700
+    list_display = ("title", "start_date", "end_date")
+    search_fields = ("title", "overview", "description")
+    list_filter = (
+        "is_highlight",
+        "is_completed",
+    )
+
+
+modeladmin_register(CourseAdmin)

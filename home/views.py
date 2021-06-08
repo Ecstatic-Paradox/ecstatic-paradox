@@ -1,6 +1,9 @@
 from .models import Attendance, AttendanceIssue
 from django.views.generic import TemplateView
 from django.shortcuts import redirect
+from wagtail.contrib.modeladmin.views import InspectView
+
+
 
 class TodayAttendance(TemplateView):
     """Handle Requests for attendance"""
@@ -18,3 +21,12 @@ class TodayAttendance(TemplateView):
         except Exception:
             pass
         return redirect("/admin")
+
+
+class AttendanceIssueInspect(InspectView):
+    def get_context_data(self, **kwargs):
+        context = {
+            'absentee_list' : self.model.get_absentee_list(self.instance)
+        }
+        context.update(kwargs)
+        return super().get_context_data(**context)

@@ -95,10 +95,10 @@ class AttendanceIssue(models.Model):
     def __str__(self):
         return str(self.date)
 
-    @property
+
     def get_absentee_list(self):
         Attendance = apps.get_model(app_label="home", model_name="Attendance")
-        return User.objects.exclude(attendance_set__in = Attendance.objects.filter(issue_date=self))
+        return User.objects.exclude(attendance__in = Attendance.objects.filter(issue_date=self))
 
 
 
@@ -140,6 +140,41 @@ class Webinar(models.Model):
         FieldPanel("registration_form"),
     ]
 
+class Symposium(models.Model):
+    date_added = models.DateField(auto_now_add=True)
+    date = models.DateField()
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    thumbnail = models.ImageField(upload_to="Symposium_thumbnails")
+    youtube_link = models.TextField()
+    registration_form = models.TextField()
+
+    panels = [
+        FieldPanel("date"),
+        FieldPanel("title"),
+        FieldPanel("description"),
+        FieldPanel("thumbnail"),
+        FieldPanel("youtube_link"),
+        FieldPanel("registration_form"),
+    ]
+
+class Course(models.Model):
+    date_added = models.DateField(auto_now_add=True)
+    date = models.DateField()
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    thumbnail = models.ImageField(upload_to="course_thumbnails")
+    youtube_link = models.TextField()
+    registration_form = models.TextField()
+
+    panels = [
+        FieldPanel("date"),
+        FieldPanel("title"),
+        FieldPanel("description"),
+        FieldPanel("thumbnail"),
+        FieldPanel("youtube_link"),
+        FieldPanel("registration_form"),
+    ]
 
 class ResearchPaper(models.Model):
     title = models.CharField(max_length=200)
@@ -182,6 +217,7 @@ class Meeting(models.Model):
     duration = models.CharField(max_length=20)
     overview = models.TextField()
     minute = models.TextField()
+    minute_file = models.FileField(upload_to='minute_file')
 
 
 class Article(Page):
