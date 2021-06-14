@@ -33,3 +33,7 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         widgets = {"date_of_birth": forms.DateInput(attrs={"type": "date"})}
+
+
+
+# class MarkMemberOnLeaveForm(forms.Form):

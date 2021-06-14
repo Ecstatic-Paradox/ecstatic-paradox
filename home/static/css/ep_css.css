@@ -1,0 +1,15 @@
+.ep_absentee_form_container{
+        margin-left: 30px;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        align-items: center;
+}
+.ep_absentee_option_forms{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.ep_absentee_option_forms > * {
+    margin:20px;
+}

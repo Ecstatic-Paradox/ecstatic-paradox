@@ -16,7 +16,7 @@ from wagtail.contrib.modeladmin.options import (
 )
 
 
-from .views import TodayAttendance, AttendanceIssueInspect
+from .views import TodayAttendance, AttendanceIssueInspect, MarkMemberOnLeaveView, AskMemberReasonView
 from .models import (
     Attendance,
     Course,
@@ -92,6 +92,10 @@ def add_notifications_panel(request, panels):
 def global_admin_css():
     return format_html('<link rel="stylesheet" href="{}">', static("css/colors.css"))
 
+@hooks.register("insert_global_admin_css")
+def global_admin_css():
+    return format_html('<link rel="stylesheet" href="{}">', static("css/ep_css.css"))
+
 
 @hooks.register("construct_main_menu")
 def main_menu_edit(request, menu_items):
@@ -112,7 +116,8 @@ hooks.register(
     "register_admin_urls",
     lambda: [
         path("today-attendance/", TodayAttendance.as_view(), name="today-attendance"),
-
+        path('mark-member-on-leave/', MarkMemberOnLeaveView.as_view(), name="mark-member-on-leave"),
+        path('ask-member-reason/', AskMemberReasonView.as_view()),
     ],
 )
 
@@ -204,7 +209,6 @@ class AttendanceIssueAdmin(ModelAdmin):
     inspect_view_enabled=True
     inspect_view_class = AttendanceIssueInspect
     inspect_view_fields = ['date', 'remarks', 'is_open', ]
-    # inspect_template_name = 'attendance_issue_inspect.html'
 
 
 class AttendanceAdminGroup(ModelAdminGroup):

@@ -1,9 +1,11 @@
+from django.views.generic.base import View
 from .models import Attendance, AttendanceIssue
 from django.views.generic import TemplateView
 from django.shortcuts import redirect
 from wagtail.contrib.modeladmin.views import InspectView
-
-
+# from django.shortcuts import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 class TodayAttendance(TemplateView):
     """Handle Requests for attendance"""
@@ -30,3 +32,23 @@ class AttendanceIssueInspect(InspectView):
         }
         context.update(kwargs)
         return super().get_context_data(**context)
+
+
+
+class MarkMemberOnLeaveView(View):
+    # http_method_names = ['post','get']
+    # permission_required = ('manage_attendance',)
+
+    def post(self, request, *args, **kwargs):
+        return redirect('/admin/')
+
+    def get(self, request, *args, **kwargs):
+        return redirect('/admin/')
+
+class AskMemberReasonView(View):
+    http_method_names = ['post']
+    permission_required = ('manage_attendance',)
+
+    def post(self, request, *args, **kwargs):
+        return HttpResponseRedirect('/admin')
+

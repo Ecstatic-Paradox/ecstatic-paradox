@@ -86,10 +86,17 @@ class AttendanceIssue(models.Model):
     is_open = models.BooleanField(default=True)
 
     def save(self, *args, **kwrgs):
-        if AttendanceIssue.objects.filter(is_open=True).count() != 0:
-            return 
-        else:
-            super().save(*args, **kwrgs)
+        if self.is_open:
+            try :
+                tmp_arr = AttendanceIssue.objects.filter(is_open=True)
+                for tmp in tmp_arr: 
+                    if self != tmp:    
+                        tmp.is_open = False
+                        tmp.save()
+            except AttendanceIssue.DoesNotExist: 
+                pass 
+        
+        super(AttendanceIssue, self).save(*args, **kwrgs)
 
 
     def __str__(self):
@@ -100,6 +107,8 @@ class AttendanceIssue(models.Model):
         Attendance = apps.get_model(app_label="home", model_name="Attendance")
         return User.objects.exclude(attendance__in = Attendance.objects.filter(issue_date=self))
 
+    class Meta:
+        permissions = [('manage_attendance', 'Can Manage Attendance System'),]
 
 
     # To do-->Add validation for the User (must be HR)
@@ -120,6 +129,7 @@ class Absentee(models.Model):
     issue_date = models.ForeignKey(AttendanceIssue, on_delete=models.CASCADE)
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     remarks = models.TextField(null=True, blank=True)
+    on_leave = models.BooleanField(default=False)
 
 
 class Webinar(models.Model):

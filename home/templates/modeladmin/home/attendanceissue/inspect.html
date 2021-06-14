@@ -1,24 +1,44 @@
-{% extends 'modeladmin/inspect.html' %}     
-     {% load i18n wagtailadmin_tags %}
-     {% block content_main %}
-            <div class="nice-padding">
+{% extends 'modeladmin/inspect.html' %} {% load i18n wagtailadmin_tags %} 
+{% block content_main %}
+<div class="nice-padding">
+  <p class="back">
+    <a href="{{ view.index_url }}" class="icon icon-arrow-left"
+      >{% blocktrans with view.verbose_name as model_name %}Back to {{ model_name }} list{% endblocktrans %}</a
+    >
+  </p>
 
-                <p class="back"><a href="{{ view.index_url }}" class="icon icon-arrow-left">{% blocktrans with view.verbose_name as model_name %}Back to {{ model_name }} list{% endblocktrans %}</a></p>
+  {% block fields_output %} {% if fields %}
+  <dl>
+    {% for field in fields %}
+    <dt class="{{ field.type|lower }}">{{ field.label }}</dt>
+    <dd>{{ field.value }}</dd>
+    {% endfor %}
+  </dl>
+  {% endif %} {% if absentee_list %} {% for member in absentee_list %}
+  <dt >
+      
+      <div class="ep_absentee_option_forms">
+        <p style="display: inline;">{{ member.username }}</p>
+    <form
+      style=" margin-left: 30px;"
+      method="POST"
+      action="/admin/mark-member-on-leave/"
+    >
+    <div class="ep_absentee_form_container">
 
-                {% block fields_output %}
-                    {% if fields %}
-                        <dl>
-                        {% for field in fields %}
-                            <dt class="{{ field.type|lower }}">{{ field.label }}</dt>
-                            <dd>{{ field.value }}</dd>
-                        {% endfor %}
-                        </dl>
-                    {% endif %}
-                    {% if absentee_list %}
-                      {% for member in absentee_list %}
-                            <dt> {{ member.username }}</dt>
-                      {% endfor %}
-                     {% endif %}
-                {% endblock %}
-            </div>
-        {% endblock %}
+      {% csrf_token %}
+      <input type="hidden" name="member_id" value="{{ member.id }}" />
+      <div class="input">
+      <input type="text" name="remarks" placeholder="Add Remarks " />
+    </div>
+      <button style="margin-left: 5px;" type="submit" class="button">Mark On leave</button>
+    </div>
+</form>
+    <a style="margin-left: 30px" href="/admin/users/{{ member.id }}">
+      <button type="button" class="button">Ask reason</button>
+    </a>
+    </div>
+  </dt>
+  {% endfor %} {% endif %} {% endblock %}
+</div>
+{% endblock %}
