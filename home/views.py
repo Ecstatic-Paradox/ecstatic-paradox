@@ -1,11 +1,12 @@
 from django.views.generic.base import View
-from .models import Attendance, AttendanceIssue
+from .models import Attendance, AttendanceIssue, User, Absentee
 from django.views.generic import TemplateView
 from django.shortcuts import redirect
 from wagtail.contrib.modeladmin.views import InspectView
 # from django.shortcuts import HttpResponse, HttpResponseRedirect
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
+
 
 class TodayAttendance(TemplateView):
     """Handle Requests for attendance"""
@@ -36,19 +37,34 @@ class AttendanceIssueInspect(InspectView):
 
 
 class MarkMemberOnLeaveView(View):
-    # http_method_names = ['post','get']
-    # permission_required = ('manage_attendance',)
+    http_method_names = ['post',]
+    permission_required = ('manage_attendance',)
 
     def post(self, request, *args, **kwargs):
-        return redirect('/admin/')
-
-    def get(self, request, *args, **kwargs):
-        return redirect('/admin/')
+        # print(f'\n\n\n {request.POST} \n\n\n')
+        member_obj = User.objects.get(id=request.POST['member_id'])
+        attendance_issue = AttendanceIssue.objects.get(id=request.POST['attendance_issue'])
+        attendance = Attendance.objects.create(
+            issue_date= attendance_issue,
+            member=member_obj,
+            status=False,
+            remarks=request.POST['remarks']
+        )
+        attendance.save()
+        return redirect(f'/admin/home/attendanceissue/inspect/{ attendance_issue.id }/')
 
 class AskMemberReasonView(View):
     http_method_names = ['post']
     permission_required = ('manage_attendance',)
 
     def post(self, request, *args, **kwargs):
-        return HttpResponseRedirect('/admin')
+        member_obj = User.objects.get(id=request.POST['member_id'])
+        attendance_issue = AttendanceIssue.objects.get(id=request.POST['attendance_issue'])
+        absentee_obj = Absentee.objects.create(
+            issue_date=attendance_issue,
+            member=member_obj
+        )
+        absentee_obj.save()
+
+        return redirect(f'/admin/home/attendanceissue/inspect/{ attendance_issue.id }/')
 

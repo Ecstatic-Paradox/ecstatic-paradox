@@ -19,6 +19,7 @@ from wagtail.contrib.modeladmin.options import (
 from .views import TodayAttendance, AttendanceIssueInspect, MarkMemberOnLeaveView, AskMemberReasonView
 from .models import (
     Attendance,
+    Absentee,
     Course,
     HomePage,
     AttendanceIssue,
@@ -190,6 +191,7 @@ class AttendanceAdmin(ModelAdmin):
     list_display = (
         "issue_date",
         "member",
+        "status"
     )
     list_filter = ("issue_date", "status", "member")
     search_fields = ("member", "remarks")
@@ -210,12 +212,23 @@ class AttendanceIssueAdmin(ModelAdmin):
     inspect_view_class = AttendanceIssueInspect
     inspect_view_fields = ['date', 'remarks', 'is_open', ]
 
+class AbsenteeListAdmin(ModelAdmin):
+    model = Absentee
+    menu_label = "Absentees"
+    menu_icon = "doc-full"
+    menu_order = 500
+    add_to_settings_menu = False
+    exclude_from_explorer = False
+    list_display = ("issue_date", "member")
+    list_filter = ("issue_date", "member")
+    search_fields = ("issue_date", "member", "remarks")
+
 
 class AttendanceAdminGroup(ModelAdminGroup):
     menu_icon = "folder-inverse"
     menu_label = "Attendance"
     menu_order = 700
-    items = (AttendanceAdmin, AttendanceIssueAdmin)
+    items = (AttendanceAdmin, AttendanceIssueAdmin, AbsenteeListAdmin)
 
 
 modeladmin_register(AttendanceAdminGroup)

@@ -63,9 +63,10 @@ class User(AbstractUser):
 
     @property
     def has_unrecorded_leave(self):
-        Absentee = apps.get_model(app_label='home', model_name='Absentee')
+        Absentee = apps.get_model(app_label="home", model_name="Absentee")
 
-        return bool(Absentee.objects.filter(member=self).filter(remarks='').count())
+        return bool(Absentee.objects.filter(member=self).filter(remarks="").count())
+
 
 @register_snippet
 class Department(models.Model):
@@ -87,29 +88,32 @@ class AttendanceIssue(models.Model):
 
     def save(self, *args, **kwrgs):
         if self.is_open:
-            try :
+            try:
                 tmp_arr = AttendanceIssue.objects.filter(is_open=True)
-                for tmp in tmp_arr: 
-                    if self != tmp:    
+                for tmp in tmp_arr:
+                    if self != tmp:
                         tmp.is_open = False
                         tmp.save()
-            except AttendanceIssue.DoesNotExist: 
-                pass 
-        
-        super(AttendanceIssue, self).save(*args, **kwrgs)
+            except AttendanceIssue.DoesNotExist:
+                pass
 
+        super(AttendanceIssue, self).save(*args, **kwrgs)
 
     def __str__(self):
         return str(self.date)
 
-
     def get_absentee_list(self):
         Attendance = apps.get_model(app_label="home", model_name="Attendance")
-        return User.objects.exclude(attendance__in = Attendance.objects.filter(issue_date=self))
+        Absentee = apps.get_model(app_label="home", model_name="Absentee")
+        return User.objects.exclude(
+            models.Q(attendance__in=Attendance.objects.filter(issue_date=self))
+            | models.Q(absentee__in=Absentee.objects.filter(issue_date=self))
+        )
 
     class Meta:
-        permissions = [('manage_attendance', 'Can Manage Attendance System'),]
-
+        permissions = [
+            ("manage_attendance", "Can Manage Attendance System"),
+        ]
 
     # To do-->Add validation for the User (must be HR)
 
@@ -120,7 +124,7 @@ class Attendance(models.Model):
     issue_date = models.ForeignKey(AttendanceIssue, on_delete=models.CASCADE)
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.BooleanField(default=True)
-    remarks = models.TextField(blank=True,null=True)
+    remarks = models.TextField(blank=True, null=True)
 
 
 class Absentee(models.Model):
@@ -129,7 +133,7 @@ class Absentee(models.Model):
     issue_date = models.ForeignKey(AttendanceIssue, on_delete=models.CASCADE)
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     remarks = models.TextField(null=True, blank=True)
-    on_leave = models.BooleanField(default=False)
+    is_filled = models.BooleanField(default=False)
 
 
 class Webinar(models.Model):
@@ -150,6 +154,7 @@ class Webinar(models.Model):
         FieldPanel("registration_form"),
     ]
 
+
 class Symposium(models.Model):
     date_added = models.DateField(auto_now_add=True)
     date = models.DateField()
@@ -168,6 +173,7 @@ class Symposium(models.Model):
         FieldPanel("registration_form"),
     ]
 
+
 class Course(models.Model):
     date_added = models.DateField(auto_now_add=True)
     date = models.DateField()
@@ -185,6 +191,7 @@ class Course(models.Model):
         FieldPanel("youtube_link"),
         FieldPanel("registration_form"),
     ]
+
 
 class ResearchPaper(models.Model):
     title = models.CharField(max_length=200)
@@ -227,7 +234,7 @@ class Meeting(models.Model):
     duration = models.CharField(max_length=20)
     overview = models.TextField()
     minute = models.TextField()
-    minute_file = models.FileField(upload_to='minute_file')
+    minute_file = models.FileField(upload_to="minute_file")
 
 
 class Article(Page):

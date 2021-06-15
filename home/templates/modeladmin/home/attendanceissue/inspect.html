@@ -28,15 +28,19 @@
 
       {% csrf_token %}
       <input type="hidden" name="member_id" value="{{ member.id }}" />
+      <input type="hidden" name="attendance_issue" value={{ instance.id }} >
       <div class="input">
-      <input type="text" name="remarks" placeholder="Add Remarks " />
-    </div>
+        <input type="text" name="remarks" placeholder="Add Remarks " required/>
+      </div>
       <button style="margin-left: 5px;" type="submit" class="button">Mark On leave</button>
     </div>
-</form>
-    <a style="margin-left: 30px" href="/admin/users/{{ member.id }}">
-      <button type="button" class="button">Ask reason</button>
-    </a>
+  </form>
+  <form style="margin-left: 30px" action="/admin/ask-member-reason/" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="member_id" value="{{ member.id }}">
+    <input type="hidden" name="attendance_issue" value="{{ instance.id }}">
+    <button type="submit" class="button">Ask reason</button>
+  </form>
     </div>
   </dt>
   {% endfor %} {% endif %} {% endblock %}
