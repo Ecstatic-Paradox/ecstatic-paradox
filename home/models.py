@@ -204,18 +204,6 @@ class ResearchPaper(models.Model):
     ]
 
 
-class Notice(models.Model):
-    date = models.DateTimeField(auto_now_add=True)
-    issuer = models.ForeignKey(User, on_delete=models.CASCADE)
-    description = models.TextField()
-    attachment = models.FileField(upload_to="notice_attachments")
-    is_pinned = models.BooleanField()
-    expiry_date = models.DateTimeField()
-
-    @property
-    def is_expired(self):
-        return True
-
 
 class Project(models.Model):
     title = models.CharField(max_length=30)
@@ -325,6 +313,7 @@ class Notification(models.Model):
     message = models.TextField()
     has_expired = models.BooleanField(default=False)
     expiry_date = models.DateTimeField(blank=True, null=True)
+    is_pinned = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.title
