@@ -281,12 +281,8 @@ class CourseAdmin(ModelAdmin):
     menu_icon = "folder-inverse"
     menu_label = "Courses"
     menu_order = 700
-    list_display = ("title", "start_date", "end_date")
-    search_fields = ("title", "overview", "description")
-    list_filter = (
-        "is_highlight",
-        "is_completed",
-    )
+    list_display = ("title", "date",)
+    search_fields = ("title", "date","description")
 
 
 modeladmin_register(CourseAdmin)
