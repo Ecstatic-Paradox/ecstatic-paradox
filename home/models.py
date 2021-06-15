@@ -154,6 +154,15 @@ class Webinar(models.Model):
         FieldPanel("registration_form"),
     ]
 
+    api_fields = [
+        APIField("date"),
+        APIField("title"),
+        APIField("description"),
+        APIField("thumbnail"),
+        APIField("youtube_link"),
+        APIField("registration_form"),
+    ]
+
 
 class Symposium(models.Model):
     date_added = models.DateField(auto_now_add=True)
@@ -171,6 +180,15 @@ class Symposium(models.Model):
         FieldPanel("thumbnail"),
         FieldPanel("youtube_link"),
         FieldPanel("registration_form"),
+    ]
+
+    api_fields = [
+        APIField("date"),
+        APIField("title"),
+        APIField("description"),
+        APIField("thumbnail"),
+        APIField("youtube_link"),
+        APIField("registration_form"),
     ]
 
 
@@ -192,17 +210,37 @@ class Course(models.Model):
         FieldPanel("registration_form"),
     ]
 
+    api_fields = [
+        APIField("date"),
+        APIField("title"),
+        APIField("description"),
+        APIField("thumbnail"),
+        APIField("youtube_link"),
+        APIField("registration_form"),
+    ]
+
+
 
 class ResearchPaper(models.Model):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=50)
     date_published = models.DateField()
+    research_paper_file = models.FileField(upload_to='research_papers', null=True)
+
     panels = [
         FieldPanel("title"),
         FieldPanel("author"),
         FieldPanel("date_published"),
+        FieldPanel("paper_file")
     ]
 
+
+    api_fields = [
+        APIField("title"),
+        APIField("date_published"),
+        APIField("author"),
+        APIField("paper_file"),
+    ]
 
 
 class Project(models.Model):
@@ -214,6 +252,17 @@ class Project(models.Model):
     description = models.TextField()
     is_highlight = models.BooleanField()
     is_completed = models.BooleanField()
+
+    api_fields = [
+        APIField("title"),
+        APIField("start_date"),
+        APIField("end_date"),
+        APIField("description"),
+        APIField("thumbnail"),
+        APIField("is_highlight"),
+        APIField("is_completed"),
+    ]
+
 
 
 class Meeting(models.Model):
