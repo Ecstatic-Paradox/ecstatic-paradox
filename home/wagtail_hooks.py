@@ -16,13 +16,14 @@ from wagtail.contrib.modeladmin.options import (
 )
 
 
-from .views import TodayAttendance, AttendanceIssueInspect, MarkMemberOnLeaveView, AskMemberReasonView
+from .views import TodayAttendance, AttendanceIssueInspect, MarkMemberOnLeaveView, AskMemberReasonView, AskForLeaveView
 from .models import (
     Attendance,
     Absentee,
     Course,
     HomePage,
     AttendanceIssue,
+    AskForLeaveMember,
     Article,
     Symposium,
     Webinar,
@@ -34,8 +35,19 @@ from .forms import CustomProfileSettingsForm
 
 import datetime
 
+# Custom admin urls
+hooks.register(
+    "register_admin_urls",
+    lambda: [
+        path("today-attendance/", TodayAttendance.as_view(), name="today-attendance"),
+        path('mark-member-on-leave/', MarkMemberOnLeaveView.as_view(), name="mark-member-on-leave"),
+        path('ask-member-reason/', AskMemberReasonView.as_view()),
+        path('ask-for-leave/', AskForLeaveView.as_view(), name='ask-for-leave')
+    ],
+)
 
-# Customize account settings
+
+# Customize account settings, Add My profile section in Account Settings Panel
 @hooks.register("register_account_settings_panel")
 class CustomSettingsPanel(BaseSettingsPanel):
     name = "profile"
@@ -45,7 +57,7 @@ class CustomSettingsPanel(BaseSettingsPanel):
     form_object = "user"
 
 
-# Add notifications page in Dashboard Home
+# Add notifications Section in Dashboard Home
 class NotificationPanel:
 
     order = 50
@@ -109,18 +121,19 @@ def main_menu_edit(request, menu_items):
     menu_items[:] = [i for i in menu_items if (i.label not in ["Pages"])]
     
     return HttpResponseRedirect('/today-attendance')
-    pass
+
+@hooks.register("register_admin_menu_item")
+def register_ask_for_leave_menuitem():
+
+    return MenuItem(
+        'Ask For Leave',
+        reverse("ask-for-leave"),
+        classnames="icon icon-date",
+        order=1200
+    )
 
 
 # ----------------- Today's Attendace Related --------------------------
-hooks.register(
-    "register_admin_urls",
-    lambda: [
-        path("today-attendance/", TodayAttendance.as_view(), name="today-attendance"),
-        path('mark-member-on-leave/', MarkMemberOnLeaveView.as_view(), name="mark-member-on-leave"),
-        path('ask-member-reason/', AskMemberReasonView.as_view()),
-    ],
-)
 
 
 class TodayAttendanceMenuItem(MenuItem):
@@ -223,12 +236,23 @@ class AbsenteeListAdmin(ModelAdmin):
     list_filter = ("issue_date", "member")
     search_fields = ("issue_date", "member", "remarks")
 
+class AskForLeaveMemberAdmin(ModelAdmin):
+    model = AskForLeaveMember
+    menu_label = "Members on Leave"
+    menu_icon = "doc-full"
+    menu_order = 500
+    add_to_settings_menu = False
+    exclude_from_explorer = False
+    list_display = ("leave_start_date","leave_end_date", "member", "is_approved")
+    list_filter = ("member", "is_approved")
+    search_fields = ("member", "remarks")
+
 
 class AttendanceAdminGroup(ModelAdminGroup):
     menu_icon = "folder-inverse"
     menu_label = "Attendance"
     menu_order = 700
-    items = (AttendanceAdmin, AttendanceIssueAdmin, AbsenteeListAdmin)
+    items = (AttendanceAdmin, AttendanceIssueAdmin, AbsenteeListAdmin, AskForLeaveMemberAdmin)
 
 
 modeladmin_register(AttendanceAdminGroup)

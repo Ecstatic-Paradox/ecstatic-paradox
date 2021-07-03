@@ -4,12 +4,21 @@
         flex-wrap: wrap;
         flex-direction: row;
         align-items: center;
-}
-.ep_absentee_option_forms{
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    }
+    .ep_absentee_option_forms{
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid black;
 }
 .ep_absentee_option_forms > * {
     margin:20px;
 }
+
+.ep_nice_padding {
+    padding: 30px;
+}
+ .ep_nice_margin {
+     margin: 20px;
+ }

@@ -1,0 +1,27 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n %}
+
+{% block titletag %}{{ view.page_title }}{% endblock %}
+
+{% block content %}
+
+    {% include "wagtailadmin/shared/header.html" with title='Ask For Leave' icon=date %}
+    <form action="/admin/ask-for-leave" method="post" class="ep_nice_padding ep_nice_margin">
+    {% csrf_token %}
+        <ul class="fields">
+        {{ form.as_ul  }}
+        </ul>
+    <button type="submit" class="button"> Submit</button>
+</form>
+    
+    {% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ form.media.js }}
+{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+    {{ form.media.css }}
+{% endblock %}
