@@ -3,6 +3,7 @@ from django import forms
 from django.db import models
 from django.apps import apps
 from django.contrib.auth.models import AbstractUser
+from django.db.models import constraints
 
 from wagtail.core.models import Page
 
@@ -115,7 +116,6 @@ class AttendanceIssue(models.Model):
             ("manage_attendance", "Can Manage Attendance System"),
         ]
 
-    # To do-->Add validation for the User (must be HR)
 
 
 class Attendance(models.Model):
@@ -126,6 +126,10 @@ class Attendance(models.Model):
     status = models.BooleanField(default=True)
     remarks = models.TextField(blank=True, null=True)
 
+    class Meta:
+        constraints= [
+            models.UniqueConstraint(fields=['issue_date', 'member'], name="unique member and issue_date")
+        ]
 
 class Absentee(models.Model):
     """Record list of reasons absentees(without informing HR)"""
@@ -134,6 +138,23 @@ class Absentee(models.Model):
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     remarks = models.TextField(null=True, blank=True)
     is_filled = models.BooleanField(default=False)
+
+class AskForLeaveMember(models.Model):
+    """ People who asked for leave  """
+
+    member = models.ForeignKey(User, on_delete=models.CASCADE)
+    remarks = models.TextField(null=True, blank=True)
+    leave_start_date = models.DateField()
+    leave_end_date = models.DateField()
+    is_approved = models.BooleanField(default=False)
+
+
+
+
+
+
+
+
 
 
 class Webinar(models.Model):
