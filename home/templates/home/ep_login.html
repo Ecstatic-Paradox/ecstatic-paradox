@@ -1,0 +1,11 @@
+{% extends "wagtailadmin/login.html" %}
+ {% load static %}
+ {% load i18n %}
+ 
+{% block extra_css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" href="{% static 'css/ep_login.css' %}" type="text/css" />
+{% endblock %}
+
+{% block branding_login %}{% trans "Ecstatic Paradox Admin Login" %}{% endblock %}

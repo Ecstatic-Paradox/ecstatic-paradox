@@ -2,8 +2,9 @@
 from django import forms
 from django.db import models
 from django.apps import apps
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Permission, Group
 from django.db.models import constraints
+
 
 from wagtail.core.models import Page
 
@@ -28,6 +29,7 @@ import datetime
 
 
 class HomePage(Page):
+    """ Wagtail Base Parent Page class for other Page Classes"""
     pass
 
 
@@ -48,6 +50,7 @@ class User(AbstractUser):
     # Also update at settings and forms html
     @property
     def is_attended_today(self):
+        """ Checks if the user has attended today"""
         AttendanceIssue = apps.get_model(app_label="home", model_name="AttendanceIssue")
         Attendance = apps.get_model(app_label="home", model_name="Attendance")
         try:
@@ -66,11 +69,50 @@ class User(AbstractUser):
     def has_unrecorded_leave(self):
         Absentee = apps.get_model(app_label="home", model_name="Absentee")
 
-        return bool(Absentee.objects.filter(member=self).filter(remarks="").count())
+        state = bool(
+            Absentee.objects.filter(member=self).filter(remarks="").count()
+        )  # Stores True if user has unrecorded leave.
+    
+
+        if state:
+            # If user is absent then remove her from all the groups (admin_access permission)
+            # and create a new group with name "oldgrp1_oldgrp2_absentee" so that later she can be reassign to her old groups.
+            if not bool(
+                [group.name for group in self.groups.all() if "absentee" in group.name]
+            ):  # do only if user already is not in absentee group
+                new_group_name = (
+                    "_".join([group.name for group in self.groups.all()]) + "_absentee"
+                )
+                try:
+                    new_group = Group.objects.get(name=new_group_name)
+                except:
+                    new_group = Group.objects.create(name=new_group_name)
+                    new_group.save()
+                self.groups.clear()
+                self.groups.add(new_group)
+                self.save()
+        else:
+            # If user wanot absent the make sure he is not in the absentee group and in his respective groups
+            absentee_groups = [
+                group for group in self.groups.all() if group.name.endswith("_absentee")
+            ]
+            
+            if absentee_groups:
+                
+                for group in absentee_groups:
+                    group.name.replace("absentee", "")
+                    new_groups_names = group.name.split("_")
+                    new_groups_names.pop()  # remove last empty element
+                    
+                    for name in new_groups_names:
+                        self.groups.add(Group.objects.get(name=name))
+            self.save()
+        return state
 
 
 @register_snippet
 class Department(models.Model):
+    """ List of Departments in ecstatic paradox"""
     department_title = models.CharField(max_length=30)
     hod = models.ForeignKey(
         "home.User", on_delete=models.SET_NULL, blank=True, null=True
@@ -88,7 +130,9 @@ class AttendanceIssue(models.Model):
     is_open = models.BooleanField(default=True)
 
     def save(self, *args, **kwrgs):
+        
         if self.is_open:
+            # Close every other attandance issue if new one is opened.
             try:
                 tmp_arr = AttendanceIssue.objects.filter(is_open=True)
                 for tmp in tmp_arr:
@@ -117,7 +161,6 @@ class AttendanceIssue(models.Model):
         ]
 
 
-
 class Attendance(models.Model):
     """Record attendance of each day"""
 
@@ -127,9 +170,12 @@ class Attendance(models.Model):
     remarks = models.TextField(blank=True, null=True)
 
     class Meta:
-        constraints= [
-            models.UniqueConstraint(fields=['issue_date', 'member'], name="unique member and issue_date")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["issue_date", "member"], name="unique member and issue_date"
+            )
         ]
+
 
 class Absentee(models.Model):
     """Record list of reasons absentees(without informing HR)"""
@@ -139,22 +185,15 @@ class Absentee(models.Model):
     remarks = models.TextField(null=True, blank=True)
     is_filled = models.BooleanField(default=False)
 
+
 class AskForLeaveMember(models.Model):
-    """ People who asked for leave  """
+    """People who asked for leave"""
 
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     remarks = models.TextField(null=True, blank=True)
     leave_start_date = models.DateField()
     leave_end_date = models.DateField()
     is_approved = models.BooleanField(default=False)
-
-
-
-
-
-
-
-
 
 
 class Webinar(models.Model):
@@ -241,20 +280,18 @@ class Course(models.Model):
     ]
 
 
-
 class ResearchPaper(models.Model):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=50)
     date_published = models.DateField()
-    research_paper_file = models.FileField(upload_to='research_papers', null=True)
+    research_paper_file = models.FileField(upload_to="research_papers", null=True)
 
     panels = [
         FieldPanel("title"),
         FieldPanel("author"),
         FieldPanel("date_published"),
-        FieldPanel("paper_file")
+        FieldPanel("paper_file"),
     ]
-
 
     api_fields = [
         APIField("title"),
@@ -283,7 +320,6 @@ class Project(models.Model):
         APIField("is_highlight"),
         APIField("is_completed"),
     ]
-
 
 
 class Meeting(models.Model):

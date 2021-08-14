@@ -1,10 +1,11 @@
 from django import forms
+from django.db import models
 from django.forms import widgets
 from django.utils.translation import gettext_lazy as _
 
 from wagtail.users.forms import UserEditForm, UserCreationForm
 from django.contrib.auth import get_user_model
-from .models import User, AskForLeaveMember
+from .models import User, AskForLeaveMember, Absentee
 
 from wagtail.admin.widgets.datetime import AdminDateInput
 
@@ -49,3 +50,19 @@ class AskForLeaveForm(forms.ModelForm):
         # This is also to show date picker. Both work fine. :) 
         widgets = {"leave_end_date": forms.DateInput(attrs={"type": "date"})}
 
+class GiveAbsentReasonForm(forms.ModelForm):
+    class Meta:
+        model = Absentee
+        fields = ['remarks','issue_date']
+        widgets = {
+            'issue_date': forms.HiddenInput(attrs={"readonly":"", "disabled": ""})
+            }
+    def __init__(self,  *args, **kwargs):
+        super(GiveAbsentReasonForm, self).__init__()
+
+        # give only option for issue_date that was passed as instance from view class
+        try: 
+            self.fields['issue_date'].widget.attrs["value"] = kwargs['instance'].issue_date.id           
+            self.fields['issue_date'].choices = [(kwargs['instance'].issue_date.id, kwargs['instance'].issue_date.__str__())]
+        except:
+            pass

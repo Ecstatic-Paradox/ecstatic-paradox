@@ -16,7 +16,14 @@ from wagtail.contrib.modeladmin.options import (
 )
 
 
-from .views import TodayAttendance, AttendanceIssueInspect, MarkMemberOnLeaveView, AskMemberReasonView, AskForLeaveView
+from .views import (
+    TodayAttendance,
+    AttendanceIssueInspect,
+    MarkMemberOnLeaveView,
+    AskMemberReasonView,
+    AskForLeaveView,
+
+)
 from .models import (
     Attendance,
     Absentee,
@@ -40,9 +47,18 @@ hooks.register(
     "register_admin_urls",
     lambda: [
         path("today-attendance/", TodayAttendance.as_view(), name="today-attendance"),
-        path('mark-member-on-leave/', MarkMemberOnLeaveView.as_view(), name="mark-member-on-leave"),
-        path('ask-member-reason/', AskMemberReasonView.as_view()),
-        path('ask-for-leave/', AskForLeaveView.as_view(), name='ask-for-leave')
+        path(
+            "mark-member-on-leave/",
+            MarkMemberOnLeaveView.as_view(),
+            name="mark-member-on-leave",
+        ),
+        path(
+
+             # this is for HR to add the absent member on the list
+            "ask-member-reason/", AskMemberReasonView.as_view()
+        ), 
+        path("ask-for-leave/", AskForLeaveView.as_view(), name="ask-for-leave" ), #link to apply for leave
+        
     ],
 )
 
@@ -105,6 +121,7 @@ def add_notifications_panel(request, panels):
 def global_admin_css():
     return format_html('<link rel="stylesheet" href="{}">', static("css/colors.css"))
 
+# Additional Custom Css
 @hooks.register("insert_global_admin_css")
 def global_admin_css():
     return format_html('<link rel="stylesheet" href="{}">', static("css/ep_css.css"))
@@ -119,17 +136,18 @@ def main_menu_edit(request, menu_items):
         )
         HomePage.save(mainpage)
     menu_items[:] = [i for i in menu_items if (i.label not in ["Pages"])]
-    
-    return HttpResponseRedirect('/today-attendance')
+
+    return HttpResponseRedirect("/today-attendance")
+
 
 @hooks.register("register_admin_menu_item")
 def register_ask_for_leave_menuitem():
 
     return MenuItem(
-        'Ask For Leave',
+        "Ask For Leave",
         reverse("ask-for-leave"),
         classnames="icon icon-date",
-        order=1200
+        order=1200,
     )
 
 
@@ -137,24 +155,24 @@ def register_ask_for_leave_menuitem():
 
 
 class TodayAttendanceMenuItem(MenuItem):
-    """Show Today's Attendance Menu option only if user isnot attended and attendance is issued that day"""
+    """Show Today's Attendance Menu option only if user has unattended attendance issue."""
 
     def is_shown(self, request):
-        return ((not request.user.is_attended_today) and bool(
+        return (not request.user.is_attended_today) and bool(
             AttendanceIssue.objects.filter(is_open=True).count()
-        ))
+        )
 
 
 @hooks.register("register_admin_menu_item")
 def register_today_attendance():
     return TodayAttendanceMenuItem(
-        "Today's Attendence",
+        "Attendence for {}".format(datetime.date.today()),
         reverse("today-attendance"),
         classnames="icon icon-date",
     )
 
 
-# Custom Dashboard Options register
+# Custom Dashboard Options (Model Admins) register
 
 
 class ArticleAdmin(ModelAdmin):
@@ -201,14 +219,9 @@ class AttendanceAdmin(ModelAdmin):
     menu_order = 300
     add_to_settings_menu = False
     exclude_from_explorer = False
-    list_display = (
-        "issue_date",
-        "member",
-        "status"
-    )
+    list_display = ("issue_date", "member", "status")
     list_filter = ("issue_date", "status", "member")
     search_fields = ("member", "remarks")
-
 
 
 class AttendanceIssueAdmin(ModelAdmin):
@@ -219,11 +232,16 @@ class AttendanceIssueAdmin(ModelAdmin):
     add_to_settings_menu = False
     exclude_from_explorer = False
     list_display = ("date",)
-    list_filter = ("date", )
+    list_filter = ("date",)
     search_fields = ("date", "remarks")
-    inspect_view_enabled=True
+    inspect_view_enabled = True
     inspect_view_class = AttendanceIssueInspect
-    inspect_view_fields = ['date', 'remarks', 'is_open', ]
+    inspect_view_fields = [
+        "date",
+        "remarks",
+        "is_open",
+    ]
+
 
 class AbsenteeListAdmin(ModelAdmin):
     model = Absentee
@@ -236,6 +254,7 @@ class AbsenteeListAdmin(ModelAdmin):
     list_filter = ("issue_date", "member")
     search_fields = ("issue_date", "member", "remarks")
 
+
 class AskForLeaveMemberAdmin(ModelAdmin):
     model = AskForLeaveMember
     menu_label = "Members on Leave"
@@ -243,7 +262,7 @@ class AskForLeaveMemberAdmin(ModelAdmin):
     menu_order = 500
     add_to_settings_menu = False
     exclude_from_explorer = False
-    list_display = ("leave_start_date","leave_end_date", "member", "is_approved")
+    list_display = ("leave_start_date", "leave_end_date", "member", "is_approved")
     list_filter = ("member", "is_approved")
     search_fields = ("member", "remarks")
 
@@ -252,7 +271,12 @@ class AttendanceAdminGroup(ModelAdminGroup):
     menu_icon = "folder-inverse"
     menu_label = "Attendance"
     menu_order = 700
-    items = (AttendanceAdmin, AttendanceIssueAdmin, AbsenteeListAdmin, AskForLeaveMemberAdmin)
+    items = (
+        AttendanceAdmin,
+        AttendanceIssueAdmin,
+        AbsenteeListAdmin,
+        AskForLeaveMemberAdmin,
+    )
 
 
 modeladmin_register(AttendanceAdminGroup)
@@ -265,6 +289,7 @@ class WebinarAdmin(ModelAdmin):
     list_display = ("title", "date")
     list_filter = ("date_added",)
     search_fields = ("title", "description")
+
 
 class SymposiumAdmin(ModelAdmin):
     model = Symposium
@@ -279,7 +304,7 @@ class ProgramsAdminGroup(ModelAdminGroup):
     menu_icon = "folder-inverse"
     menu_label = "Programs"
     menu_order = 700
-    items = (WebinarAdmin,SymposiumAdmin)
+    items = (WebinarAdmin, SymposiumAdmin)
 
 
 modeladmin_register(ProgramsAdminGroup)
@@ -300,13 +325,17 @@ class ProjectAdmin(ModelAdmin):
 
 modeladmin_register(ProjectAdmin)
 
+
 class CourseAdmin(ModelAdmin):
     model = Course
     menu_icon = "folder-inverse"
     menu_label = "Courses"
     menu_order = 700
-    list_display = ("title", "date",)
-    search_fields = ("title", "date","description")
+    list_display = (
+        "title",
+        "date",
+    )
+    search_fields = ("title", "date", "description")
 
 
 modeladmin_register(CourseAdmin)

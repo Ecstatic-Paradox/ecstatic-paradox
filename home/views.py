@@ -1,10 +1,21 @@
-from django import forms
+from django.http.response import Http404
 from django.views.generic.base import View
 from .models import Attendance, AttendanceIssue, User, Absentee, AskForLeaveMember
 from django.views.generic import TemplateView
 from django.shortcuts import redirect, render
 from wagtail.contrib.modeladmin.views import InspectView
-from .forms import AskForLeaveForm
+from .forms import AskForLeaveForm, GiveAbsentReasonForm
+from wagtail.admin.views.account import LoginView
+
+class CustomLoginView(LoginView):
+    """ Handles Login, Especially redirects user to Form if they have unspecified leave. """ 
+    template_name = "home/ep_login.html"
+    def get_success_url(self):
+
+        # TODO : check if user was absent then  lead them to fill up form .. else super().get_success_url()
+        if self.request.user.has_unrecorded_leave:
+            return "/give-absent-reason/"
+        return super().get_success_url()
 
 
 class TodayAttendance(TemplateView):
@@ -97,3 +108,30 @@ class AskForLeaveView(View):
             )
             obj.save()
         return redirect("/admin")
+
+class GiveAbsentReason(View):
+    template_name = "home/give-absent-reason.html"
+    form_class = GiveAbsentReasonForm
+
+    
+    def get(self, request, *args, **kwargs):
+        if self.request.user:
+
+            unfilled_instance = Absentee.objects.filter(member=self.request.user).filter(remarks="").first()
+            
+            form = GiveAbsentReasonForm(instance=unfilled_instance)
+
+            return render(
+                request, self.template_name, {"form": form, "view": self}
+            )
+
+        return redirect('/admin')
+    
+    def post(self, request, *args, **kwargs):
+            print(request.POST)
+        # try: 
+            issue_date_id = int(request.POST["issue_date"])
+        # except:
+            # raise Http404
+            return redirect('/admin')
+        
