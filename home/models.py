@@ -36,6 +36,8 @@ class HomePage(Page):
 class User(AbstractUser):
     """Store General information about user and also handle auth."""
 
+    #First Name, Last Name, Email, Username, Password From Abstract Class.
+    
     country = models.CharField(max_length=20)
     address = models.CharField(max_length=20, blank=True, null=True)
     contact = models.CharField(max_length=20)
@@ -48,32 +50,40 @@ class User(AbstractUser):
     date_of_birth = models.DateField(blank=True, null=True)
 
     # Also update at settings and forms html
-    @property
-    def is_attended_today(self):
-        """ Checks if the user has attended today"""
+    def __str__(self) -> str:
+        return "User: {} ".format(self.first_name)
+    
+    def get_unattended_issue(self):
+        """ Returns Open Attendance issue not attended by user"""
+
         AttendanceIssue = apps.get_model(app_label="home", model_name="AttendanceIssue")
         Attendance = apps.get_model(app_label="home", model_name="Attendance")
+        
         try:
-            today_attendance_issue = AttendanceIssue.objects.get(
-                date__lte=datetime.date.today(), is_open=True
-            )
-        except Exception:
-            return False
-        return bool(
-            Attendance.objects.filter(
-                issue_date=today_attendance_issue, member=self
-            ).count()
-        )
+            open_issue = AttendanceIssue.objects.get(is_open=True)
+            attendance_record = Attendance.objects.get(issue_date=open_issue, member=self)
+        
+        except :
+            return None
+
+
+        if attendance_record : # Check if user has attendance record for open issue
+            return None # return none if user has attended
+        else: 
+            return open_issue #return Open Attendance issue if user has not attended
+
+    
 
     @property
     def has_unrecorded_leave(self):
+        """ Returns if user has any unrecorded leave and blocks all permission for user."""
         Absentee = apps.get_model(app_label="home", model_name="Absentee")
 
         state = bool(
-            Absentee.objects.filter(member=self).filter(remarks="").count()
+            Absentee.objects.filter(member=self).filter(remarks=None).count()
         )  # Stores True if user has unrecorded leave.
     
-
+        print("\n\n\n {}: {} \n\n\n".format(state, self))
         if state:
             # If user is absent then remove her from all the groups (admin_access permission)
             # and create a new group with name "oldgrp1_oldgrp2_absentee" so that later she can be reassign to her old groups.
@@ -85,14 +95,14 @@ class User(AbstractUser):
                 )
                 try:
                     new_group = Group.objects.get(name=new_group_name)
-                except:
+                except Group.DoesNotExist:
                     new_group = Group.objects.create(name=new_group_name)
                     new_group.save()
                 self.groups.clear()
                 self.groups.add(new_group)
                 self.save()
         else:
-            # If user wanot absent the make sure he is not in the absentee group and in his respective groups
+            # If user wasnot absent the make sure he is not in the absentee group and in his respective groups
             absentee_groups = [
                 group for group in self.groups.all() if group.name.endswith("_absentee")
             ]
@@ -105,9 +115,13 @@ class User(AbstractUser):
                     new_groups_names.pop()  # remove last empty element
                     
                     for name in new_groups_names:
-                        self.groups.add(Group.objects.get(name=name))
+                        try: # Try to find the respective group, if doesnot exists then continue
+                            self.groups.add(Group.objects.get(name=name))
+                        except Group.DoesNotExist:
+                            continue
             self.save()
         return state
+        
 
 
 @register_snippet
@@ -119,13 +133,13 @@ class Department(models.Model):
     )
 
     def __str__(self):
-        return self.department_title
+        return "{} Department".format(self.department_title)
 
 
 class AttendanceIssue(models.Model):
     """Record which days attendance was opened by HR"""
 
-    date = models.DateTimeField(unique=True)
+    date = models.DateField(unique=True)
     remarks = models.TextField(blank=True, null=True)
     is_open = models.BooleanField(default=True)
 
@@ -145,16 +159,20 @@ class AttendanceIssue(models.Model):
         super(AttendanceIssue, self).save(*args, **kwrgs)
 
     def __str__(self):
-        return str(self.date)
+        return "Attendance Issue: {} ".format(str(self.date))
 
     def get_absentee_list(self):
+        """ Get unrecorded leave for particular issue users""" 
         Attendance = apps.get_model(app_label="home", model_name="Attendance")
         Absentee = apps.get_model(app_label="home", model_name="Absentee")
-        return User.objects.exclude(
+        try:
+            ret = User.objects.exclude(
             models.Q(attendance__in=Attendance.objects.filter(issue_date=self))
             | models.Q(absentee__in=Absentee.objects.filter(issue_date=self))
         )
-
+        except: 
+            ret = None
+        return ret    
     class Meta:
         permissions = [
             ("manage_attendance", "Can Manage Attendance System"),
@@ -162,7 +180,7 @@ class AttendanceIssue(models.Model):
 
 
 class Attendance(models.Model):
-    """Record attendance of each day"""
+    """Record attendance of each issue. Just Like Attendance Sheet"""
 
     issue_date = models.ForeignKey(AttendanceIssue, on_delete=models.CASCADE)
     member = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -175,6 +193,9 @@ class Attendance(models.Model):
                 fields=["issue_date", "member"], name="unique member and issue_date"
             )
         ]
+    
+    def __str__(self) -> str:
+        return "Attendance: {} of {}".format(self.member.first_name, str(self.issue_date.date))
 
 
 class Absentee(models.Model):
@@ -184,6 +205,10 @@ class Absentee(models.Model):
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     remarks = models.TextField(null=True, blank=True)
     is_filled = models.BooleanField(default=False)
+    
+    def __str__(self) -> str:
+        return "Absente: {} on {}".format(self.member.first_name, str(self.issue_date.date))
+
 
 
 class AskForLeaveMember(models.Model):
@@ -195,6 +220,8 @@ class AskForLeaveMember(models.Model):
     leave_end_date = models.DateField()
     is_approved = models.BooleanField(default=False)
 
+    def __str__(self) -> str:
+        return "Leave Request: {}".format(self.member.first_name)
 
 class Webinar(models.Model):
     date_added = models.DateField(auto_now_add=True)
@@ -376,6 +403,7 @@ class Article(Page):
 
 # ---------------------Categories
 class CustomSection(models.Model):
+    """ Sections for Blog and Articles"""
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=80)
 
@@ -414,6 +442,7 @@ class ProjectSection(CustomSection):
 
 @register_snippet
 class Notification(models.Model):
+    """ Notifications to show on dashboard""" 
     date_added = models.DateTimeField(auto_now=True)
     title = models.CharField(max_length=128)
     message = models.TextField()

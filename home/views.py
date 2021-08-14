@@ -1,42 +1,43 @@
-from django.http.response import Http404
+from django.http.response import Http404, HttpResponseNotFound
 from django.views.generic.base import View
 from .models import Attendance, AttendanceIssue, User, Absentee, AskForLeaveMember
 from django.views.generic import TemplateView
 from django.shortcuts import redirect, render
 from wagtail.contrib.modeladmin.views import InspectView
-from .forms import AskForLeaveForm, GiveAbsentReasonForm
+from .forms import ApplyForLeaveForm, GiveAbsentReasonForm
 from wagtail.admin.views.account import LoginView
 
 class CustomLoginView(LoginView):
     """ Handles Login, Especially redirects user to Form if they have unspecified leave. """ 
     template_name = "home/ep_login.html"
     def get_success_url(self):
-
-        # TODO : check if user was absent then  lead them to fill up form .. else super().get_success_url()
-        if self.request.user.has_unrecorded_leave:
+        
+        #checks if user has unrecordeed leave and removes all permission if True
+        if self.request.user.has_unrecorded_leave: 
             return "/give-absent-reason/"
         return super().get_success_url()
 
 
-class TodayAttendance(TemplateView):
+class FillAttendance(TemplateView):
     """Handle Requests for attendance"""
 
-    template_name = "home/today_attendance.html"
+    template_name = "home/fill_attendance.html"
 
     def post(self, request, **args):
         try:
-            if request.user and (not request.user.is_attended_today):
+            if request.user and (not request.user.get_unattended_issue() ):
                 Attendance.objects.create(
                     member=request.user,
                     issue_date=AttendanceIssue.objects.get(is_open=True),
                     status=True,
                 )
-        except Exception:
-            pass
+        except Attendance.DoesNotExist:
+            return HttpResponseNotFound()
         return redirect("/admin")
 
 
 class AttendanceIssueInspect(InspectView):
+    """ Adds absentee information in Attendance Inspect View"""
     def get_context_data(self, **kwargs):
         context = {"absentee_list": self.model.get_absentee_list(self.instance)}
         context.update(kwargs)
@@ -52,10 +53,14 @@ class MarkMemberOnLeaveView(View):
     permission_required = ("manage_attendance",)
 
     def post(self, request, *args, **kwargs):
-        member_obj = User.objects.get(id=request.POST["member_id"])
-        attendance_issue = AttendanceIssue.objects.get(
-            id=request.POST["attendance_issue"]
-        )
+        try: 
+            member_obj = User.objects.get(id=request.POST["member_id"])
+            attendance_issue = AttendanceIssue.objects.get(
+                id=request.POST["attendance_issue"]
+            )
+        except User.DoesNotExist or AttendanceIssue.DoesNotExist:
+            return HttpResponseNotFound()
+
         attendance = Attendance.objects.create(
             issue_date=attendance_issue,
             member=member_obj,
@@ -66,17 +71,20 @@ class MarkMemberOnLeaveView(View):
         return redirect(f"/admin/home/attendanceissue/inspect/{ attendance_issue.id }/")
 
 
-class AskMemberReasonView(View):
+class AddMemberasAbsent(View):
     """Handles admin/ask-member-reason/ from attandanceinspect view"""
 
     http_method_names = ["post"]
     permission_required = ("manage_attendance",)
 
     def post(self, request, *args, **kwargs):
-        member_obj = User.objects.get(id=request.POST["member_id"])
-        attendance_issue = AttendanceIssue.objects.get(
-            id=request.POST["attendance_issue"]
-        )
+        try: 
+            member_obj = User.objects.get(id=request.POST["member_id"])
+            attendance_issue = AttendanceIssue.objects.get(
+                id=request.POST["attendance_issue"]
+            )
+        except User.DoesNotExist or AttendanceIssue.DoesNotExist:
+            return HttpResponseNotFound()
         absentee_obj = Absentee.objects.create(
             issue_date=attendance_issue, member=member_obj
         )
@@ -85,11 +93,11 @@ class AskMemberReasonView(View):
         return redirect(f"/admin/home/attendanceissue/inspect/{ attendance_issue.id }/")
 
 
-class AskForLeaveView(View):
-    form_class = AskForLeaveForm
+class ApplyForLeaveView(View):
+    form_class = ApplyForLeaveForm
     permission_required = "manage_attendance"
     template_name = "wagtailadmin/generic/create.html"
-    page_title = "Ask For Leave Form"
+    page_title = "Apply For Leave Form"
     header_icon = "date"
 
     def get(self, request, *args, **kwargs):
@@ -116,13 +124,19 @@ class GiveAbsentReason(View):
     
     def get(self, request, *args, **kwargs):
         if self.request.user:
-
-            unfilled_instance = Absentee.objects.filter(member=self.request.user).filter(remarks="").first()
+            try: 
+                unfilled_user_instance = Absentee.objects.filter(member=self.request.user)
+                
+                unfilled_remarks_instance = unfilled_user_instance.filter(remarks="")
+                unfilled_instance = unfilled_remarks_instance.first()
             
+            except Absentee.DoesNotExist:
+                return redirect("/admin")
+
             form = GiveAbsentReasonForm(instance=unfilled_instance)
 
             return render(
-                request, self.template_name, {"form": form, "view": self}
+                request, self.template_name, { "form": form, "view": self,}
             )
 
         return redirect('/admin')

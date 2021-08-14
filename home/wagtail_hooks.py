@@ -1,3 +1,4 @@
+from os import name
 from django.urls import reverse
 from django.urls import path, reverse
 from django.utils.html import format_html
@@ -17,11 +18,11 @@ from wagtail.contrib.modeladmin.options import (
 
 
 from .views import (
-    TodayAttendance,
+    FillAttendance,
     AttendanceIssueInspect,
     MarkMemberOnLeaveView,
-    AskMemberReasonView,
-    AskForLeaveView,
+    AddMemberasAbsent,
+    ApplyForLeaveView,
 
 )
 from .models import (
@@ -46,7 +47,7 @@ import datetime
 hooks.register(
     "register_admin_urls",
     lambda: [
-        path("today-attendance/", TodayAttendance.as_view(), name="today-attendance"),
+        path("fill-attendance/", FillAttendance.as_view(), name="fill-attendance"),
         path(
             "mark-member-on-leave/",
             MarkMemberOnLeaveView.as_view(),
@@ -55,9 +56,9 @@ hooks.register(
         path(
 
              # this is for HR to add the absent member on the list
-            "ask-member-reason/", AskMemberReasonView.as_view()
+            "add-member-as-absent/", AddMemberasAbsent.as_view(), name="add-member-absent"
         ), 
-        path("ask-for-leave/", AskForLeaveView.as_view(), name="ask-for-leave" ), #link to apply for leave
+        path("apply-for-leave/", ApplyForLeaveView.as_view(), name="apply-for-leave" ), #link to apply for leave
         
     ],
 )
@@ -137,7 +138,7 @@ def main_menu_edit(request, menu_items):
         HomePage.save(mainpage)
     menu_items[:] = [i for i in menu_items if (i.label not in ["Pages"])]
 
-    return HttpResponseRedirect("/today-attendance")
+    return HttpResponseRedirect("/fill-attendance")
 
 
 @hooks.register("register_admin_menu_item")
@@ -145,7 +146,7 @@ def register_ask_for_leave_menuitem():
 
     return MenuItem(
         "Ask For Leave",
-        reverse("ask-for-leave"),
+        reverse("apply-for-leave"),
         classnames="icon icon-date",
         order=1200,
     )
@@ -158,7 +159,7 @@ class TodayAttendanceMenuItem(MenuItem):
     """Show Today's Attendance Menu option only if user has unattended attendance issue."""
 
     def is_shown(self, request):
-        return (not request.user.is_attended_today) and bool(
+        return (not request.user.get_unattended_issue() ) and bool(
             AttendanceIssue.objects.filter(is_open=True).count()
         )
 
@@ -166,8 +167,8 @@ class TodayAttendanceMenuItem(MenuItem):
 @hooks.register("register_admin_menu_item")
 def register_today_attendance():
     return TodayAttendanceMenuItem(
-        "Attendence for {}".format(datetime.date.today()),
-        reverse("today-attendance"),
+        "Open Attendence",
+        reverse("fill-attendance"),
         classnames="icon icon-date",
     )
 

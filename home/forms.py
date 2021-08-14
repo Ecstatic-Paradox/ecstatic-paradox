@@ -39,7 +39,7 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 
-class AskForLeaveForm(forms.ModelForm):
+class ApplyForLeaveForm(forms.ModelForm):
     # To show date picker 
     leave_start_date = forms.DateField(widget=AdminDateInput)
     
