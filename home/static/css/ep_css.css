@@ -1,24 +1,62 @@
-.ep_absentee_form_container{
-        margin-left: 30px;
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        align-items: center;
-    }
-    .ep_absentee_option_forms{
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1px solid black;
+.ep_absentee_form_container,
+.ep_members_list_container {
+  margin-left: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+}
+.ep_absentee_option_forms {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid black;
 }
 .ep_absentee_option_forms > * {
-    margin:20px;
+  margin: 20px;
 }
 
 .ep_nice_padding {
-    padding: 30px;
+  padding: 30px;
 }
- .ep_nice_margin {
-     margin: 20px;
- }
+.ep_nice_margin {
+  margin: 20px;
+}
+
+.ep_members_list_item {
+  width: 300px;
+  margin: 10px;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ep_item_photo > img {
+  max-height: 200px;
+  object-fit: cover;
+}
+
+.ep_profile_container > ul {
+  list-style: none;
+}
+
+.ep_profile_container > ul > li {
+  margin: 20px;
+  font-size: 20px;
+}
+
+.ep_profile_container .ep_thumbnail_img > img {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border: 1px solid var(--color-primary-darker);
+  border-radius: 300px;
+}
+ul.ep_absent_record {
+  margin-top: 70px;
+}
+ul.ep_absent_record > li {
+  margin-top: 20px;
+}

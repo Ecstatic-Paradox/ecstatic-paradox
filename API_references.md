@@ -1,18 +1,26 @@
 # API References
 
-### /api/register
-**Allowed Methods:** `POST`   
-To register new member accounts. Following infos must be passed as Formdata or JSON.  
-` 
-{ "first_name" : "Ram", 
-"last_name": "Prasad",     
-"username": "Ramprasad123",    
-"email": "ram@gmail.comXXX",    
-"password" : "SOMETHINGSECRET123",
-"profile": {
-"contact_number": "980000000",
-"facebook_profile" : "facebook.comXXXXXXXXXXXX"
-"country": "Antartica",
-}
-}
-`
+### api/images/
+**Method Allowed : `GET`**
+
+### api/documents/
+**Method Allowed : `GET`**
+
+### api/articles/
+**Method Allowed : `GET`**
+
+### api/webinars/
+**Method Allowed : `GET`**
+
+### api/symposiums/
+**Method Allowed : `GET`**
+
+### api/courses/
+**Method Allowed : `GET`**
+
+### api/researchpapers/
+**Method Allowed : `GET`**
+
+### api/projects/ 
+**Method Allowed : `GET`**
+

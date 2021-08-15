@@ -1,19 +1,24 @@
-from django.http.response import Http404, HttpResponseNotFound
+from django.http.response import Http404, HttpResponseBadRequest, HttpResponseNotFound
+from django.utils import safestring
 from django.views.generic.base import View
+from django.views.generic import TemplateView, DetailView, ListView
+
 from .models import Attendance, AttendanceIssue, User, Absentee, AskForLeaveMember
-from django.views.generic import TemplateView
 from django.shortcuts import redirect, render
 from wagtail.contrib.modeladmin.views import InspectView
 from .forms import ApplyForLeaveForm, GiveAbsentReasonForm
 from wagtail.admin.views.account import LoginView
 
+
 class CustomLoginView(LoginView):
-    """ Handles Login, Especially redirects user to Form if they have unspecified leave. """ 
+    """Handles Login, Especially redirects user to Form if they have unspecified leave."""
+
     template_name = "home/ep_login.html"
+
     def get_success_url(self):
-        
-        #checks if user has unrecordeed leave and removes all permission if True
-        if self.request.user.has_unrecorded_leave: 
+
+        # checks if user has unrecordeed leave and removes all permission if True
+        if self.request.user.has_unrecorded_leave:
             return "/give-absent-reason/"
         return super().get_success_url()
 
@@ -25,7 +30,7 @@ class FillAttendance(TemplateView):
 
     def post(self, request, **args):
         try:
-            if request.user and (not request.user.get_unattended_issue() ):
+            if request.user and (not request.user.get_unattended_issue()):
                 Attendance.objects.create(
                     member=request.user,
                     issue_date=AttendanceIssue.objects.get(is_open=True),
@@ -37,7 +42,8 @@ class FillAttendance(TemplateView):
 
 
 class AttendanceIssueInspect(InspectView):
-    """ Adds absentee information in Attendance Inspect View"""
+    """Adds absentee information in Attendance Inspect View"""
+
     def get_context_data(self, **kwargs):
         context = {"absentee_list": self.model.get_absentee_list(self.instance)}
         context.update(kwargs)
@@ -53,7 +59,7 @@ class MarkMemberOnLeaveView(View):
     permission_required = ("manage_attendance",)
 
     def post(self, request, *args, **kwargs):
-        try: 
+        try:
             member_obj = User.objects.get(id=request.POST["member_id"])
             attendance_issue = AttendanceIssue.objects.get(
                 id=request.POST["attendance_issue"]
@@ -78,7 +84,7 @@ class AddMemberasAbsent(View):
     permission_required = ("manage_attendance",)
 
     def post(self, request, *args, **kwargs):
-        try: 
+        try:
             member_obj = User.objects.get(id=request.POST["member_id"])
             attendance_issue = AttendanceIssue.objects.get(
                 id=request.POST["attendance_issue"]
@@ -110,42 +116,81 @@ class ApplyForLeaveView(View):
         if form_data.is_valid():
             obj = AskForLeaveMember.objects.create(
                 member=request.user,
-                remarks = form_data.cleaned_data["remarks"],
-                leave_start_date = form_data.cleaned_data["leave_start_date"],
-                leave_end_date = form_data.cleaned_data["leave_end_date"],
+                remarks=form_data.cleaned_data["remarks"],
+                leave_start_date=form_data.cleaned_data["leave_start_date"],
+                leave_end_date=form_data.cleaned_data["leave_end_date"],
             )
             obj.save()
         return redirect("/admin")
+
 
 class GiveAbsentReason(View):
     template_name = "home/give-absent-reason.html"
     form_class = GiveAbsentReasonForm
 
-    
     def get(self, request, *args, **kwargs):
         if self.request.user:
-            try: 
-                unfilled_user_instance = Absentee.objects.filter(member=self.request.user)
-                
-                unfilled_remarks_instance = unfilled_user_instance.filter(remarks="")
+            try:
+                unfilled_user_instance = Absentee.objects.filter(
+                    member=self.request.user
+                )
+
+                unfilled_remarks_instance = unfilled_user_instance.filter(remarks=None)
                 unfilled_instance = unfilled_remarks_instance.first()
-            
+
+                if unfilled_instance == None:
+                    raise Absentee.DoesNotExist
+
             except Absentee.DoesNotExist:
                 return redirect("/admin")
 
             form = GiveAbsentReasonForm(instance=unfilled_instance)
 
             return render(
-                request, self.template_name, { "form": form, "view": self,}
+                request,
+                self.template_name,
+                {
+                    "page_title": "Give Reason for absent on "
+                    + str(unfilled_instance.issue_date.date),
+                    "form": form,
+                    "view": self,
+                },
             )
 
-        return redirect('/admin')
-    
+        return redirect("/admin")
+
     def post(self, request, *args, **kwargs):
-            print(request.POST)
-        # try: 
-            issue_date_id = int(request.POST["issue_date"])
-        # except:
-            # raise Http404
-            return redirect('/admin')
-        
+        if self.request.user:
+            try:
+                issue_date_id = int(request.POST["issue_date"])
+                remarks = safestring.SafeString(request.POST["remarks"])
+
+                issue_date_instance = AttendanceIssue.objects.get(id=issue_date_id)
+                absentee_instance = Absentee.objects.get(
+                    issue_date=issue_date_instance,
+                    member=self.request.user,
+                    remarks=None,
+                )
+            except:
+                return HttpResponseBadRequest()
+
+            absentee_instance.remarks = remarks
+            absentee_instance.save()
+
+        return redirect("/admin")
+
+
+class MembersListView(ListView):
+    template_name = "home/members_list.html"
+    context_object_name = "members"
+    model = User
+
+    
+
+
+class MemberInspectView(DetailView):
+
+    template_name= "home/member_profile.html"
+    context_object_name = "member"
+    model = User
+

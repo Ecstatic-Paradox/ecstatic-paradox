@@ -23,6 +23,8 @@ from .views import (
     MarkMemberOnLeaveView,
     AddMemberasAbsent,
     ApplyForLeaveView,
+    MembersListView,
+    MemberInspectView
 
 )
 from .models import (
@@ -47,6 +49,8 @@ import datetime
 hooks.register(
     "register_admin_urls",
     lambda: [
+        path('members', MembersListView.as_view(), name='members' ),
+        path('members/<int:pk>', MemberInspectView.as_view(), name='member-profile' ),
         path("fill-attendance/", FillAttendance.as_view(), name="fill-attendance"),
         path(
             "mark-member-on-leave/",
@@ -145,10 +149,20 @@ def main_menu_edit(request, menu_items):
 def register_ask_for_leave_menuitem():
 
     return MenuItem(
-        "Ask For Leave",
+        "Apply For Leave",
         reverse("apply-for-leave"),
         classnames="icon icon-date",
         order=1200,
+    )
+
+@hooks.register("register_admin_menu_item")
+def register_members_list_menuitem():
+
+    return MenuItem(
+        "Members",
+        reverse("members"),
+        classnames="icon icon-user",
+        order=200,
     )
 
 
@@ -159,9 +173,7 @@ class TodayAttendanceMenuItem(MenuItem):
     """Show Today's Attendance Menu option only if user has unattended attendance issue."""
 
     def is_shown(self, request):
-        return (not request.user.get_unattended_issue() ) and bool(
-            AttendanceIssue.objects.filter(is_open=True).count()
-        )
+        return bool(request.user.get_unattended_issue())
 
 
 @hooks.register("register_admin_menu_item")
@@ -258,7 +270,7 @@ class AbsenteeListAdmin(ModelAdmin):
 
 class AskForLeaveMemberAdmin(ModelAdmin):
     model = AskForLeaveMember
-    menu_label = "Members on Leave"
+    menu_label = "Leave Applications"
     menu_icon = "doc-full"
     menu_order = 500
     add_to_settings_menu = False

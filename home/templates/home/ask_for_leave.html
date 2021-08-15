@@ -5,8 +5,8 @@
 
 {% block content %}
 
-    {% include "wagtailadmin/shared/header.html" with title='Ask For Leave' icon=date %}
-    <form action="/admin/ask-for-leave" method="post" class="ep_nice_padding ep_nice_margin">
+    {% include "wagtailadmin/shared/header.html" with title='Apply For Leave' icon=date %}
+    <form action="/admin/apply-for-leave" method="post" class="ep_nice_padding ep_nice_margin">
     {% csrf_token %}
         <ul class="fields">
         {{ form.as_ul  }}

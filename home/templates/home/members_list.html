@@ -1,0 +1,30 @@
+{% extends "wagtailadmin/base.html" %}
+
+{% load  wagtailadmin_tags i18n %}
+
+{% block titletag %}{{ view.page_title }}{% endblock %}
+
+{% block content %}
+    
+    {% include "wagtailadmin/shared/header.html" with title='Members' icon='user'  %}
+<div class="ep_members_list_container ep_nice_padding">
+
+{% for i in members %} 
+<a href="/admin/members/{{ i.id }}">
+<div class="ep_members_list_item">
+    <div class="ep_item_photo">
+            <img src="{% avatar_url i 100 %}" alt="Photo: {{ i.get_full_name }}">
+    </div>
+    <div class="ep_item_name">{{ i.get_full_name }}</div>
+    <div class="ep_item_text "> {{ i.designation  }}, {{ i.user_department }}</div>
+
+
+</div>
+</a>
+{% endfor %}
+
+</div>
+
+
+{% endblock content %}
+

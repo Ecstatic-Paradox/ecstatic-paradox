@@ -4,9 +4,11 @@ from django.db import models
 from django.apps import apps
 from django.contrib.auth.models import AbstractUser, Permission, Group
 from django.db.models import constraints
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from wagtail.core.models import Page
+from wagtail.users.models import UserProfile
 
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from wagtail.admin.edit_handlers import (
@@ -29,15 +31,16 @@ import datetime
 
 
 class HomePage(Page):
-    """ Wagtail Base Parent Page class for other Page Classes"""
+    """Wagtail Base Parent Page class for other Page Classes"""
+
     pass
 
 
 class User(AbstractUser):
     """Store General information about user and also handle auth."""
 
-    #First Name, Last Name, Email, Username, Password From Abstract Class.
-    
+    # First Name, Last Name, Email, Username, Password From Abstract Class.
+    # Access Profile picture through user.wagtail_userprofile.avatar (Provided in post_save )
     country = models.CharField(max_length=20)
     address = models.CharField(max_length=20, blank=True, null=True)
     contact = models.CharField(max_length=20)
@@ -48,41 +51,45 @@ class User(AbstractUser):
     fb_profile_link = models.CharField(max_length=1000, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
+    designation = models.CharField(max_length=1000,default="Member", blank=True, null=True)
+    
 
-    # Also update at settings and forms html
+    # If any updates is made in the User fields then also update at settings.py "WAGTAIL_USER_CUSTOM_FIELDS"
+    # and CustomProfileSettingsForm on form.py  and templates on wagtailusers\users\create.html & edit.html
+    # In order make the fields editable through Wagtail settings.
+
     def __str__(self) -> str:
         return "User: {} ".format(self.first_name)
-    
+
     def get_unattended_issue(self):
-        """ Returns Open Attendance issue not attended by user"""
+        """Returns Open Attendance issue not attended by user"""
 
         AttendanceIssue = apps.get_model(app_label="home", model_name="AttendanceIssue")
         Attendance = apps.get_model(app_label="home", model_name="Attendance")
-        
+
         try:
             open_issue = AttendanceIssue.objects.get(is_open=True)
-            attendance_record = Attendance.objects.get(issue_date=open_issue, member=self)
-        
-        except :
+            attendance_record = Attendance.objects.get(
+                issue_date=open_issue, member=self
+            )
+
+        except:
             return None
 
-
-        if attendance_record : # Check if user has attendance record for open issue
-            return None # return none if user has attended
-        else: 
-            return open_issue #return Open Attendance issue if user has not attended
-
-    
+        if attendance_record:  # Check if user has attendance record for open issue
+            return None  # return none if user has attended
+        else:
+            return open_issue  # return Open Attendance issue if user has not attended
 
     @property
     def has_unrecorded_leave(self):
-        """ Returns if user has any unrecorded leave and blocks all permission for user."""
+        """Returns if user has any unrecorded leave and blocks all permission for user."""
         Absentee = apps.get_model(app_label="home", model_name="Absentee")
 
         state = bool(
             Absentee.objects.filter(member=self).filter(remarks=None).count()
         )  # Stores True if user has unrecorded leave.
-    
+
         print("\n\n\n {}: {} \n\n\n".format(state, self))
         if state:
             # If user is absent then remove her from all the groups (admin_access permission)
@@ -106,27 +113,47 @@ class User(AbstractUser):
             absentee_groups = [
                 group for group in self.groups.all() if group.name.endswith("_absentee")
             ]
-            
+
             if absentee_groups:
-                
+
                 for group in absentee_groups:
                     group.name.replace("absentee", "")
                     new_groups_names = group.name.split("_")
                     new_groups_names.pop()  # remove last empty element
-                    
+
                     for name in new_groups_names:
-                        try: # Try to find the respective group, if doesnot exists then continue
+                        try:  # Try to find the respective group, if doesnot exists then continue
                             self.groups.add(Group.objects.get(name=name))
                         except Group.DoesNotExist:
                             continue
             self.save()
         return state
-        
+
+    search_fields = [index.SearchField("First Name"), index.SearchField("institution")]
+
+    def get_absent_record(self):
+        Absentee = apps.get_model(app_label="home", model_name="Absentee")
+
+        return Absentee.objects.filter(member=self)
+
+
+@receiver(post_save, sender=User, dispatch_uid="create_wagtail_userprofile")
+def create_wagtail_userprofile(sender, instance, **kwargs):
+    # if not "wagtail_userprofile" in dir(self): # Create olny if already doesnot exists. Else Unique constraint will Fail
+    try:
+        user_profile = UserProfile.objects.get(user=instance)
+    except UserProfile.DoesNotExist:
+        user_profile = UserProfile.objects.create(user=instance)
+        user_profile.save()
+
+    # This One to One relation with UserProfile provides different cool features of wagtail like Avatar, notification settings etc
+    # Access Profile picture through user.wagtail_userprofile.avatar
 
 
 @register_snippet
 class Department(models.Model):
-    """ List of Departments in ecstatic paradox"""
+    """List of Departments in ecstatic paradox"""
+
     department_title = models.CharField(max_length=30)
     hod = models.ForeignKey(
         "home.User", on_delete=models.SET_NULL, blank=True, null=True
@@ -144,7 +171,7 @@ class AttendanceIssue(models.Model):
     is_open = models.BooleanField(default=True)
 
     def save(self, *args, **kwrgs):
-        
+
         if self.is_open:
             # Close every other attandance issue if new one is opened.
             try:
@@ -162,17 +189,18 @@ class AttendanceIssue(models.Model):
         return "Attendance Issue: {} ".format(str(self.date))
 
     def get_absentee_list(self):
-        """ Get unrecorded leave for particular issue users""" 
+        """Get unrecorded leave for particular issue users"""
         Attendance = apps.get_model(app_label="home", model_name="Attendance")
         Absentee = apps.get_model(app_label="home", model_name="Absentee")
         try:
             ret = User.objects.exclude(
-            models.Q(attendance__in=Attendance.objects.filter(issue_date=self))
-            | models.Q(absentee__in=Absentee.objects.filter(issue_date=self))
-        )
-        except: 
+                models.Q(attendance__in=Attendance.objects.filter(issue_date=self))
+                | models.Q(absentee__in=Absentee.objects.filter(issue_date=self))
+            )
+        except:
             ret = None
-        return ret    
+        return ret
+
     class Meta:
         permissions = [
             ("manage_attendance", "Can Manage Attendance System"),
@@ -193,9 +221,11 @@ class Attendance(models.Model):
                 fields=["issue_date", "member"], name="unique member and issue_date"
             )
         ]
-    
+
     def __str__(self) -> str:
-        return "Attendance: {} of {}".format(self.member.first_name, str(self.issue_date.date))
+        return "Attendance: {} of {}".format(
+            self.member.first_name, str(self.issue_date.date)
+        )
 
 
 class Absentee(models.Model):
@@ -205,14 +235,15 @@ class Absentee(models.Model):
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     remarks = models.TextField(null=True, blank=True)
     is_filled = models.BooleanField(default=False)
-    
-    def __str__(self) -> str:
-        return "Absente: {} on {}".format(self.member.first_name, str(self.issue_date.date))
 
+    def __str__(self) -> str:
+        return "Absente: {} on {}".format(
+            self.member.first_name, str(self.issue_date.date)
+        )
 
 
 class AskForLeaveMember(models.Model):
-    """People who asked for leave"""
+    """People who applied for leave"""
 
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     remarks = models.TextField(null=True, blank=True)
@@ -223,7 +254,12 @@ class AskForLeaveMember(models.Model):
     def __str__(self) -> str:
         return "Leave Request: {}".format(self.member.first_name)
 
-class Webinar(models.Model):
+    class Meta:
+        permissions = [
+            ("manage_attendance", "Can Manage Attendance System"),
+        ]
+
+class Webinar(models.Model, index.Indexed):
     date_added = models.DateField(auto_now_add=True)
     date = models.DateField()
     title = models.CharField(max_length=200)
@@ -250,8 +286,13 @@ class Webinar(models.Model):
         APIField("registration_form"),
     ]
 
+    search_fields = [
+        index.SearchField("title", partial_match=True),
+        index.SearchField("description", partial_match=True),
+    ]
 
-class Symposium(models.Model):
+
+class Symposium(models.Model, index.Indexed):
     date_added = models.DateField(auto_now_add=True)
     date = models.DateField()
     title = models.CharField(max_length=200)
@@ -277,9 +318,13 @@ class Symposium(models.Model):
         APIField("youtube_link"),
         APIField("registration_form"),
     ]
+    search_fields = [
+        index.SearchField("title", partial_match=True),
+        index.SearchField("description", partial_match=True),
+    ]
 
 
-class Course(models.Model):
+class Course(models.Model, index.Indexed):
     date_added = models.DateField(auto_now_add=True)
     date = models.DateField()
     title = models.CharField(max_length=200)
@@ -305,9 +350,13 @@ class Course(models.Model):
         APIField("youtube_link"),
         APIField("registration_form"),
     ]
+    search_fields = [
+        index.SearchField("title", partial_match=True),
+        index.SearchField("description", partial_match=True),
+    ]
 
 
-class ResearchPaper(models.Model):
+class ResearchPaper(models.Model, index.Indexed):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=50)
     date_published = models.DateField()
@@ -317,18 +366,25 @@ class ResearchPaper(models.Model):
         FieldPanel("title"),
         FieldPanel("author"),
         FieldPanel("date_published"),
-        FieldPanel("paper_file"),
+        FieldPanel("research_paper_file"),
     ]
 
     api_fields = [
         APIField("title"),
         APIField("date_published"),
         APIField("author"),
-        APIField("paper_file"),
+        APIField("research_paper_file"),
     ]
 
+    search_fields = [
+        index.SearchField("title", partial_match=True),
+        index.SearchField("author", partial_match=True),
+    ]
 
-class Project(models.Model):
+    def __str__(self) -> str:
+        return "{}".format(self.title)
+
+class Project(models.Model, index.Indexed):
     title = models.CharField(max_length=30)
     overview = models.TextField()
     start_date = models.DateField()
@@ -347,7 +403,14 @@ class Project(models.Model):
         APIField("is_highlight"),
         APIField("is_completed"),
     ]
+    search_fields = [
+        index.SearchField("title", partial_match=True),
+        index.SearchField("description", partial_match=True),
+        index.SearchField("overview", partial_match=True),
+    ]
 
+    def __str__(self) -> str:
+        return self.title
 
 class Meeting(models.Model):
     date = models.DateTimeField()
@@ -356,6 +419,10 @@ class Meeting(models.Model):
     overview = models.TextField()
     minute = models.TextField()
     minute_file = models.FileField(upload_to="minute_file")
+
+    def __str__(self) -> str:
+        return self.title
+
 
 
 class Article(Page):
@@ -401,9 +468,12 @@ class Article(Page):
         return self.owner.get_full_name()
 
 
+
+
 # ---------------------Categories
 class CustomSection(models.Model):
-    """ Sections for Blog and Articles"""
+    """Sections for Blog and Articles"""
+
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=80)
 
@@ -442,7 +512,8 @@ class ProjectSection(CustomSection):
 
 @register_snippet
 class Notification(models.Model):
-    """ Notifications to show on dashboard""" 
+    """Notifications to show on dashboard"""
+
     date_added = models.DateTimeField(auto_now=True)
     title = models.CharField(max_length=128)
     message = models.TextField()

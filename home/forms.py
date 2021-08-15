@@ -23,6 +23,7 @@ class CustomProfileSettingsForm(forms.ModelForm):
             "institution",
             "bio",
             "fb_profile_link",
+            "designation"
         )
 
 
@@ -55,14 +56,10 @@ class GiveAbsentReasonForm(forms.ModelForm):
         model = Absentee
         fields = ['remarks','issue_date']
         widgets = {
-            'issue_date': forms.HiddenInput(attrs={"readonly":"", "disabled": ""})
+            'issue_date': forms.HiddenInput(attrs={"readonly":"" })
             }
     def __init__(self,  *args, **kwargs):
         super(GiveAbsentReasonForm, self).__init__()
 
-        # give only option for issue_date that was passed as instance from view class
-        try: 
-            self.fields['issue_date'].widget.attrs["value"] = kwargs['instance'].issue_date.id           
-            self.fields['issue_date'].choices = [(kwargs['instance'].issue_date.id, kwargs['instance'].issue_date.__str__())]
-        except:
-            pass
+        # Auto fill the value for issue_date hidden 
+        self.fields['issue_date'].widget.attrs["value"] = kwargs['instance'].issue_date.id           

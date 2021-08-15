@@ -2,8 +2,9 @@
 {% load i18n %}
 
 
+
 {% block furniture %}
-{% include "wagtailadmin/shared/header.html" with title='Give Reason for absent on ' icon=date %}
+{% include "wagtailadmin/shared/header.html" with title=page_title icon=date %}
     
     <form action="/give-absent-reason/" method="post" class="ep_nice_padding ep_nice_margin">
     {% csrf_token %}
@@ -13,6 +14,7 @@
     <button type="submit" class="button"> Submit</button>
 </form> 
 {% endblock %}
+
 {% block extra_css%}
 <style>
     .wrapper{
