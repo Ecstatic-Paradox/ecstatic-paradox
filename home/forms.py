@@ -9,6 +9,9 @@ from .models import User, AskForLeaveMember, Absentee
 
 from wagtail.admin.widgets.datetime import AdminDateInput
 
+from captcha.fields import CaptchaField
+
+
 class CustomProfileSettingsForm(forms.ModelForm):
     country = forms.CharField(required=True, label=_("Country"))
 
@@ -38,7 +41,9 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         widgets = {"date_of_birth": forms.DateInput(attrs={"type": "date"})}
 
-
+class FillAttendanceForm(forms.Form):
+    """ Attendance Form """
+    captacha = CaptchaField()
 
 class ApplyForLeaveForm(forms.ModelForm):
     # To show date picker 

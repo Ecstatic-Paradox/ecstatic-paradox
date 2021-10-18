@@ -30,13 +30,15 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns = urlpatterns + [
-
     path(
-            # this is to ask members reason why they were absent.
-            "give-absent-reason/", GiveAbsentReason.as_view(), name="give-absent-reason"
-        ),
-
-    # For anything not caught by a more specific rule above, hand over to
+        # this is to ask members reason why they were absent.
+        "give-absent-reason/",
+        GiveAbsentReason.as_view(),
+        name="give-absent-reason",
+    ),
+    path(
+        "captcha/", include("captcha.urls")
+    ),  # For anything not caught by a more specific rule above, hand over to
     # Wagtail's page serving mechanism. This should be the last pattern in
     # the list:
     path("", include(wagtail_urls)),

@@ -51,8 +51,9 @@ class User(AbstractUser):
     fb_profile_link = models.CharField(max_length=1000, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
-    designation = models.CharField(max_length=1000,default="Member", blank=True, null=True)
-    
+    designation = models.CharField(
+        max_length=1000, default="Member", blank=True, null=True
+    )
 
     # If any updates is made in the User fields then also update at settings.py "WAGTAIL_USER_CUSTOM_FIELDS"
     # and CustomProfileSettingsForm on form.py  and templates on wagtailusers\users\create.html & edit.html
@@ -69,16 +70,17 @@ class User(AbstractUser):
 
         try:
             open_issue = AttendanceIssue.objects.get(is_open=True)
+
+        except AttendanceIssue.DoesNotExist:
+            return None
+
+        try:  # Check if user has attendance record for open issue
             attendance_record = Attendance.objects.get(
                 issue_date=open_issue, member=self
             )
-
-        except:
-            return None
-
-        if attendance_record:  # Check if user has attendance record for open issue
             return None  # return none if user has attended
-        else:
+
+        except Attendance.DoesNotExist:
             return open_issue  # return Open Attendance issue if user has not attended
 
     @property
@@ -259,6 +261,7 @@ class AskForLeaveMember(models.Model):
             ("manage_attendance", "Can Manage Attendance System"),
         ]
 
+
 class Webinar(models.Model, index.Indexed):
     date_added = models.DateField(auto_now_add=True)
     date = models.DateField()
@@ -384,6 +387,7 @@ class ResearchPaper(models.Model, index.Indexed):
     def __str__(self) -> str:
         return "{}".format(self.title)
 
+
 class Project(models.Model, index.Indexed):
     title = models.CharField(max_length=30)
     overview = models.TextField()
@@ -393,6 +397,7 @@ class Project(models.Model, index.Indexed):
     description = models.TextField()
     is_highlight = models.BooleanField()
     is_completed = models.BooleanField()
+    sections = models.ManyToManyField("home.ProjectSection", blank=True)
 
     api_fields = [
         APIField("title"),
@@ -402,15 +407,27 @@ class Project(models.Model, index.Indexed):
         APIField("thumbnail"),
         APIField("is_highlight"),
         APIField("is_completed"),
+        APIField("sections"),
     ]
     search_fields = [
         index.SearchField("title", partial_match=True),
         index.SearchField("description", partial_match=True),
         index.SearchField("overview", partial_match=True),
     ]
+    panels = [
+        FieldPanel("title"),
+        FieldPanel("start_date"),
+        FieldPanel("end_date"),
+        FieldPanel("description"),
+        FieldPanel("thumbnail"),
+        FieldPanel("is_highlight"),
+        FieldPanel("is_completed"),
+        FieldPanel("sections", widget=forms.CheckboxSelectMultiple),
+    ]
 
     def __str__(self) -> str:
         return self.title
+
 
 class Meeting(models.Model):
     date = models.DateTimeField()
@@ -422,7 +439,6 @@ class Meeting(models.Model):
 
     def __str__(self) -> str:
         return self.title
-
 
 
 class Article(Page):
@@ -468,8 +484,6 @@ class Article(Page):
         return self.owner.get_full_name()
 
 
-
-
 # ---------------------Categories
 class CustomSection(models.Model):
     """Sections for Blog and Articles"""
@@ -507,6 +521,9 @@ class CourseSection(CustomSection):
 
 @register_snippet
 class ProjectSection(CustomSection):
+
+    def __str__(self):
+        return self.name
     pass
 
 

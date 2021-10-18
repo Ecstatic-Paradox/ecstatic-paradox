@@ -6,7 +6,7 @@ from django.views.generic import TemplateView, DetailView, ListView
 from .models import Attendance, AttendanceIssue, User, Absentee, AskForLeaveMember
 from django.shortcuts import redirect, render
 from wagtail.contrib.modeladmin.views import InspectView
-from .forms import ApplyForLeaveForm, GiveAbsentReasonForm
+from .forms import ApplyForLeaveForm, GiveAbsentReasonForm, FillAttendanceForm
 from wagtail.admin.views.account import LoginView
 
 
@@ -27,18 +27,32 @@ class FillAttendance(TemplateView):
     """Handle Requests for attendance"""
 
     template_name = "home/fill_attendance.html"
+    form_class = FillAttendanceForm
+    
+    def get_context_data(self, **kwargs):
+        context = {"form": self.form_class}
+        context.update(kwargs)
+        return super().get_context_data(**context)
 
     def post(self, request, **args):
-        try:
-            if request.user and (not request.user.get_unattended_issue()):
-                Attendance.objects.create(
-                    member=request.user,
-                    issue_date=AttendanceIssue.objects.get(is_open=True),
-                    status=True,
-                )
-        except Attendance.DoesNotExist:
-            return HttpResponseNotFound()
-        return redirect("/admin")
+        form = FillAttendanceForm(request.POST)
+        if form.is_valid():
+            try:
+                if request.user and (not bool(request.user.get_unattended_issue())):
+                    print(f"\n\n\n {request.user} \n\n\n {AttendanceIssue.objects.get(is_open=True)} \n\n\n ")
+                    attendance = Attendance.objects.create(
+                        member=request.user,
+                        issue_date=AttendanceIssue.objects.get(is_open=True),
+                        status=True,
+                    )
+                    attendance.save()
+            except Exception as e:
+                print("\n\n {} \n\n ".format(e))
+                return HttpResponseNotFound()
+            return redirect("/admin")
+        
+        else:
+            return HttpResponseBadRequest()
 
 
 class AttendanceIssueInspect(InspectView):
