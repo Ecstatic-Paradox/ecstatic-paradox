@@ -155,14 +155,4 @@ Homepage contains basic introductory stuffs [EDIT THIS]
 + Default Wagtail Auth System.
 
 
-### Attendence System
-**Model:** `Attendance`
-  - Attendance will be opened by HR(probably everyday at 9pm) (Automation is also possible).
-  - Those member who fill out the form will have record on Attendance table with status True.
-  - Those members who are on leave should ask HR for leave. Only HR will have permission to mark members on leave with additional Remarks(Reason for leave).
-  - List of members whose record isnot obtained on **Attendence** table for specific date(status neither attended(True) nor on leave(False)) will be provided to HR on need after 10pm of that day.
-  - HR will have permission to add member as leave or to send the absentee member link to ask for reason.
-  - Information About absentee member will be stored in **Absentee** Table.
-  - Remarks from **Absentee** Table will be public.
  
-### 
