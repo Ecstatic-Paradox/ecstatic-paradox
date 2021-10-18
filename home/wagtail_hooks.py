@@ -30,6 +30,7 @@ from .views import (
 from .models import (
     Attendance,
     Absentee,
+    Collaborators,
     Course,
     HomePage,
     AttendanceIssue,
@@ -338,6 +339,14 @@ class ProjectAdmin(ModelAdmin):
 
 modeladmin_register(ProjectAdmin)
 
+
+class CollaboratorsAdmin(ModelAdmin):
+    model = Collaborators
+    menu_icon = "folder-inverse"
+    menu_label = "Collaborators"
+    menu_order = 700
+
+modeladmin_register(CollaboratorsAdmin)
 
 class CourseAdmin(ModelAdmin):
     model = Course

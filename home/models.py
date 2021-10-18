@@ -55,6 +55,7 @@ class User(AbstractUser):
         max_length=1000, default="Member", blank=True, null=True
     )
 
+    is_core_member = models.BooleanField(default=True)
     # If any updates is made in the User fields then also update at settings.py "WAGTAIL_USER_CUSTOM_FIELDS"
     # and CustomProfileSettingsForm on form.py  and templates on wagtailusers\users\create.html & edit.html
     # In order make the fields editable through Wagtail settings.
@@ -260,6 +261,10 @@ class AskForLeaveMember(models.Model):
         permissions = [
             ("manage_attendance", "Can Manage Attendance System"),
         ]
+
+class Collaborators(models.Model):
+    title = models.CharField(max_length=40)
+    icon = models.ImageField(upload_to="collaborators_icons")
 
 
 class Webinar(models.Model, index.Indexed):

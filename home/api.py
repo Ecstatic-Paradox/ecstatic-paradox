@@ -1,3 +1,5 @@
+from django.views import generic
+from rest_framework.response import Response
 from wagtail.api.v2.views import PagesAPIViewSet
 from wagtail.api.v2.router import WagtailAPIRouter
 from wagtail.images.api.v2.views import ImagesAPIViewSet
@@ -5,9 +7,12 @@ from wagtail.documents.api.v2.views import DocumentsAPIViewSet
 
 from django.urls import path
 from wagtail.api.v2.views import BaseAPIViewSet
-from rest_framework import serializers
+from rest_framework import serializers, viewsets
+
 from .models import (
+    User,
     Article,
+    Collaborators,
     Webinar,
     Symposium,
     Course,
@@ -16,7 +21,7 @@ from .models import (
     ProjectSection
 
 )
-from .serializers import ProjectSerializer, ProjectSectionSerializer, ResearchPaperSerializer
+from .serializers import CollaboratorsSerializer, CoreMemberSerializer, ProjectSerializer, ProjectSectionSerializer, ResearchPaperSerializer
 
 api_router = WagtailAPIRouter("wagtailapi")
 
@@ -114,6 +119,30 @@ class ProjectSectionAPIViewSet(BaseAPIViewSet):
     def get_queryset(self):
         return self.model.objects.all()
 
+class AboutAPIViewSet(BaseAPIViewSet):
+    model = Collaborators
+
+    def collaborators_list(self, req):
+        queryset = Collaborators.objects.all()
+        serializer = CollaboratorsSerializer(queryset, many=True,context =self.get_serializer_context())
+        
+        return Response(serializer.data)
+
+    def members_list(self, req):
+        queryset = User.objects.all().filter(is_core_member=True)
+        serializer = CoreMemberSerializer(queryset, many=True,context =self.get_serializer_context())
+
+        return Response(serializer.data)
+    @classmethod
+    def get_urlpatterns(cls):
+        """
+        This returns a list of URL patterns for the endpoint
+        """
+        return [
+            path('collaborators/', cls.as_view({'get': 'collaborators_list'}), name='detail'),
+            path('core-members/', cls.as_view({'get': 'members_list'}), name='detail'),
+        ]
+
 # api_router.register_endpoint("pages", PagesAPIViewSet)
 api_router.register_endpoint("images", ImagesAPIViewSet)
 api_router.register_endpoint("documents", DocumentsAPIViewSet)
@@ -124,4 +153,4 @@ api_router.register_endpoint("courses", CourseAPIViewSet)
 api_router.register_endpoint("researchpapers", ResearchPaperAPIViewSet)
 api_router.register_endpoint("projects", ProjectAPIViewSet)
 api_router.register_endpoint("projects/sections", ProjectSectionAPIViewSet)
-# api_router.register_endpoint("projects/sections/<slug>", ProjectSectionAPIViewSet)
+api_router.register_endpoint("about", AboutAPIViewSet)
