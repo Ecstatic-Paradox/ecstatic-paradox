@@ -361,22 +361,40 @@ class Course(models.Model, index.Indexed):
 
 class ResearchPaper(models.Model, index.Indexed):
     title = models.CharField(max_length=200)
-    author = models.CharField(max_length=50)
+    author = models.ManyToManyField(User)
     date_published = models.DateField()
-    research_paper_file = models.FileField(upload_to="research_papers", null=True)
+    # research_paper_file = models.FileField(upload_to="research_papers", null=True)
+    content = StreamField(
+        [
+            ("heading", blocks.CharBlock(classname="topics")),
+            ("paragraph", blocks.RichTextBlock()),
+            ("image", ImageChooserBlock(icon="image")),
+        ],
+        null=True,
+        blank=True,
+    )
+    refrences = StreamField(
+        [("refrence", blocks.CharBlock(classname="refrence"))]
+     ,null=True,
+        blank=True,)
+
+    view = models.BigIntegerField(default=0)
 
     panels = [
         FieldPanel("title"),
         FieldPanel("author"),
         FieldPanel("date_published"),
-        FieldPanel("research_paper_file"),
+        StreamFieldPanel("content", classname="full"),
+        StreamFieldPanel("refrences", classname="full"),
     ]
 
     api_fields = [
         APIField("title"),
         APIField("date_published"),
         APIField("author"),
-        APIField("research_paper_file"),
+        APIField("content"),
+        APIField("refrences"),
+        APIField("view")
     ]
 
     search_fields = [
