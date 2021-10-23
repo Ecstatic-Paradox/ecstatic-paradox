@@ -12,17 +12,27 @@ class ProjectSerializer(BaseSerializer):
 
     class Meta:
         model = Project
-        fields ="__all__"
+        fields ="__all__" 
         
+
+class ProjectListSerializer(BaseSerializer):
+    detail_url = DetailUrlField(read_only=True)
+    meta_fields =[]
+
+    class Meta:
+        model = Project
+        fields = ["id","thumbnail","title","description"]
  
 
 class ProjectSectionSerializer(BaseSerializer):  
     detail_url = DetailUrlField(read_only=True)
     meta_fields =[]
+    projects = ProjectListSerializer(many=True)
 
     class Meta:
         model = ProjectSection
-        fields = ['id','name', 'slug','detail_url']
+        fields = ['id','name', 'slug','detail_url','projects']
+        depth = 1
 
 
 class AuthorSerializer(serializers.ModelSerializer):

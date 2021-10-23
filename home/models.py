@@ -420,7 +420,7 @@ class Project(models.Model, index.Indexed):
     description = models.TextField()
     is_highlight = models.BooleanField()
     is_completed = models.BooleanField()
-    sections = models.ManyToManyField("home.ProjectSection", blank=True)
+    sections = models.ManyToManyField("home.ProjectSection", related_name="projects", blank=True)
 
     api_fields = [
         APIField("title"),
