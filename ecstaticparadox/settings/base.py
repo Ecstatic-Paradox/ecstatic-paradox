@@ -50,9 +50,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -155,6 +157,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
 
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+       'http://localhost:3000',
+)
+
 # Wagtail settings
 
 WAGTAIL_SITE_NAME = "ecstaticparadox"
@@ -179,3 +187,4 @@ WAGTAIL_USER_CUSTOM_FIELDS = [
     "designation"
 ]
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+

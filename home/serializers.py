@@ -16,6 +16,7 @@ class ProjectSerializer(BaseSerializer):
     title = serializers.CharField()
     thumbnail = serializers.ImageField()
     description = serializers.CharField()
+    
     members = AuthorSerializer(many=True, read_only=True)
     meta_fields =[]
 
@@ -43,6 +44,7 @@ class ProjectSectionSerializer(BaseSerializer):
     #     lookup_field = 'slug', view_name='projectsectionapiviewset', read_only=True
     # )
     meta_fields =[]
+    projects = ProjectListSerializer(many=True)
 
     class Meta:
         model = ProjectSection

@@ -201,7 +201,6 @@ class MembersListView(ListView):
 
     
 
-
 class MemberInspectView(DetailView):
 
     template_name= "home/member_profile.html"
