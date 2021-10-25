@@ -63,7 +63,7 @@ class ProjectAPIViewSet(BaseAPIViewSet):
     model = Project
     base_serializer_class = ProjectSerializer
     meta_fields = ['detail_url', 'sections']
-    listing_default_fields  = ['id','sections','detail_url']
+    listing_default_fields  = ['id','sections','detail_url','title','thumbnail']
 
     def listing_view(self, request):
         response = super().listing_view(request)
