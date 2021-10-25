@@ -22,6 +22,7 @@ class CustomProfileSettingsForm(forms.ModelForm):
             "date_of_birth",
             "address",
             "contact",
+            "gender",
             "user_department",
             "institution",
             "bio",
