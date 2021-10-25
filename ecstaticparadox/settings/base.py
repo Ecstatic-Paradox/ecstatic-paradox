@@ -170,6 +170,7 @@ WAGTAIL_USER_CUSTOM_FIELDS = [
     "country",
     "address",
     "contact",
+    "gender",
     "date_of_birth",
     "user_department",
     "institution",

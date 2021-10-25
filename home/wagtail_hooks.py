@@ -331,10 +331,7 @@ class ProjectAdmin(ModelAdmin):
     menu_order = 700
     list_display = ("title", "start_date", "end_date")
     search_fields = ("title", "overview", "description")
-    list_filter = (
-        "is_highlight",
-        "is_completed",
-    )
+    list_filter = ("members",)
 
 
 modeladmin_register(ProjectAdmin)

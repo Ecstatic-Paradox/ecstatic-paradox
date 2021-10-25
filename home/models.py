@@ -54,7 +54,7 @@ class User(AbstractUser):
     designation = models.CharField(
         max_length=1000, default="Member", blank=True, null=True
     )
-
+    gender = models.BooleanField(null=True, blank=True,)
     is_core_member = models.BooleanField(default=True)
     # If any updates is made in the User fields then also update at settings.py "WAGTAIL_USER_CUSTOM_FIELDS"
     # and CustomProfileSettingsForm on form.py  and templates on wagtailusers\users\create.html & edit.html
@@ -368,7 +368,8 @@ class ResearchPaper(models.Model, index.Indexed):
     title = models.CharField(max_length=200)
     author = models.ManyToManyField(User)
     date_published = models.DateField()
-    # research_paper_file = models.FileField(upload_to="research_papers", null=True)
+    is_highlight = models.BooleanField()
+    is_completed = models.BooleanField()
     content = StreamField(
         [
             ("heading", blocks.CharBlock(classname="topics")),
@@ -413,14 +414,23 @@ class ResearchPaper(models.Model, index.Indexed):
 
 class Project(models.Model, index.Indexed):
     title = models.CharField(max_length=30)
-    overview = models.TextField()
+    members = models.ManyToManyField(User)
     start_date = models.DateField()
     end_date = models.DateField()
     thumbnail = models.ImageField()
     description = models.TextField()
-    is_highlight = models.BooleanField()
-    is_completed = models.BooleanField()
     sections = models.ManyToManyField("home.ProjectSection", blank=True)
+    slug = models.SlugField(unique=True)
+    content = StreamField(
+        [
+            ("heading", blocks.CharBlock(classname="full title")),
+            ("paragraph", blocks.RichTextBlock()),
+            ("image", ImageChooserBlock(icon="image")),
+            ("embedded_video", EmbedBlock(icon="media")),
+        ],
+        null=True,
+        blank=True,
+    )
 
     api_fields = [
         APIField("title"),
@@ -428,24 +438,25 @@ class Project(models.Model, index.Indexed):
         APIField("end_date"),
         APIField("description"),
         APIField("thumbnail"),
-        APIField("is_highlight"),
-        APIField("is_completed"),
         APIField("sections"),
+        APIField("members"),
+        APIField("content"),
     ]
     search_fields = [
         index.SearchField("title", partial_match=True),
         index.SearchField("description", partial_match=True),
-        index.SearchField("overview", partial_match=True),
+        index.SearchField("content", partial_match=True),
     ]
     panels = [
         FieldPanel("title"),
         FieldPanel("start_date"),
         FieldPanel("end_date"),
+        FieldPanel("members"),
         FieldPanel("description"),
         FieldPanel("thumbnail"),
-        FieldPanel("is_highlight"),
-        FieldPanel("is_completed"),
+        StreamFieldPanel("content", classname="full"),
         FieldPanel("sections", widget=forms.CheckboxSelectMultiple),
+        FieldPanel("slug"),
     ]
 
     def __str__(self) -> str:
@@ -466,29 +477,35 @@ class Meeting(models.Model):
 
 class Article(Page):
     date_published = models.DateTimeField()
-    content = StreamField(
-        [
-            ("heading", blocks.CharBlock(classname="full title")),
-            ("paragraph", blocks.RichTextBlock()),
-            ("image", ImageChooserBlock(icon="image")),
-            ("embedded_video", EmbedBlock(icon="media")),
-        ],
-        null=True,
-        blank=True,
-    )
+    # content is repaced by pdf_file
+    # content = StreamField(
+    #     [
+    #         ("heading", blocks.CharBlock(classname="full title")),
+    #         ("paragraph", blocks.RichTextBlock()),
+    #         ("image", ImageChooserBlock(icon="image")),
+    #         ("embedded_video", EmbedBlock(icon="media")),
+    #     ],
+    #     null=True,
+    #     blank=True,
+    # )
+
+    pdf_file = models.FileField(upload_to='article_files', null=True)
     sections = ParentalManyToManyField("home.PublicationSection", blank=True)
+    thumbnail = models.ImageField(upload_to='article_thumbnails', null=True)
+
+
     # API configuration
     api_fields = [
         APIField("date_published"),
-        APIField("content"),
+        # APIField("content"),
         APIField("sections"),
         APIField("author"),
+        APIField("thumbnail"),
+        APIField("pdf_file"),
     ]
     # Search index configuration
 
     search_fields = Page.search_fields + [
-        index.SearchField("content"),
-        # index.SearchField("author"),
         index.FilterField("date_published"),
     ]
 
@@ -496,8 +513,12 @@ class Article(Page):
 
     content_panels = Page.content_panels + [
         FieldPanel("date_published"),
+        FieldPanel("pdf_file"),
+        FieldPanel("thumbnail"),
         # FieldPanel("author"),
-        StreamFieldPanel("content", classname="full"),
+        # FieldPanel("slug"),
+
+        # StreamFieldPanel("content", classname="full"),
         FieldPanel("sections", widget=forms.CheckboxSelectMultiple),
     ]
     parent_page_types = ["home.HomePage"]
