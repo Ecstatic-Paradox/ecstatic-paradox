@@ -97,8 +97,8 @@ class ArticleAPIViewSet(EPBaseAPIViewSet):
     model = Article
     lookup_field = 'slug'
     meta_fields = ['title','detail_url', ]
-    body_fields = ['date_published',]
-    listing_default_fields= ["title","date_published", "detail_url"]
+    body_fields = ['id','slug','date_published','author']
+    listing_default_fields= ['id','slug',"title","date_published", "detail_url",'author']
     def get_queryset(self):
         return self.model.objects.filter(live=True).order_by("-id")
 
@@ -136,7 +136,7 @@ class ProjectAPIViewSet(EPBaseAPIViewSet):
     model = Project
     base_serializer_class = ProjectSerializer
     meta_fields = ['sections'] #detail_url
-    body_fields = ["slug", "detail_url"]
+    body_fields = ["id","slug", "detail_url"]
     listing_default_fields  = ['id','title','thumbnail','slug']
     lookup_field = "slug"
     lookup_url_kwarg = "slug"

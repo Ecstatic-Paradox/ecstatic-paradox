@@ -48,7 +48,7 @@ class ProjectSectionSerializer(BaseSerializer):
 
     class Meta:
         model = ProjectSection
-        fields = ['name', 'slug','detail_url','project_set']
+        fields = ["id",'name', 'slug','detail_url','project_set']
         extra_kwargs = {'detail_url': {'lookup_field': 'slug'}}
 
 
