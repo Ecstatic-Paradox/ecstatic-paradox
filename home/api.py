@@ -135,29 +135,11 @@ class ResearchPaperAPIViewSet(BaseAPIViewSet):
 class ProjectAPIViewSet(EPBaseAPIViewSet):
     model = Project
     base_serializer_class = ProjectSerializer
-<<<<<<< HEAD
-    meta_fields = ['detail_url', 'sections']
-    listing_default_fields  = ['id','sections','detail_url','title','thumbnail']
-=======
-    meta_fields = [
-        # "title",
-        "detail_url",
-        # "sections",
-        # "thumbnail",
-    ]
-    listing_default_fields = [
-    #     "id",
-        "title",
-        "sections",
-        "detail_url",
-        "thumbnail",
-        "description",
-    #     "members",
-    ]
-    
-    lookup_field = 'slug'
-    # lookup_url_kwarg = 'slug'
->>>>>>> ef775975754c78b87ba693e9064ade36289f03b7
+    meta_fields = ['sections'] #detail_url
+    body_fields = ["slug", "detail_url"]
+    listing_default_fields  = ['id','title','thumbnail','slug']
+    lookup_field = "slug"
+    lookup_url_kwarg = "slug"
 
     def listing_view(self, request):
         response = super().listing_view(request)

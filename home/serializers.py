@@ -16,13 +16,13 @@ class ProjectSerializer(BaseSerializer):
     title = serializers.CharField()
     thumbnail = serializers.ImageField()
     description = serializers.CharField()
-    
     members = AuthorSerializer(many=True, read_only=True)
     meta_fields =[]
 
     class Meta:
         model = Project
         fields ="__all__"
+        # extra_kwargs = {'detail_url': {'lookup_field': 'slug'}}
 
 class ProjectListSerializer(BaseSerializer):
     sections = serializers.StringRelatedField(many=True)
@@ -35,7 +35,7 @@ class ProjectListSerializer(BaseSerializer):
 
     class Meta:
         model = Project
-        fields =["title","detail_url","sections","thumbnail","description"]
+        fields =["title","detail_url","slug","sections","thumbnail","description"]
         
 
 class ProjectSectionSerializer(BaseSerializer):  
@@ -44,11 +44,11 @@ class ProjectSectionSerializer(BaseSerializer):
     #     lookup_field = 'slug', view_name='projectsectionapiviewset', read_only=True
     # )
     meta_fields =[]
-    projects = ProjectListSerializer(many=True)
+    project_set = ProjectListSerializer(many=True)
 
     class Meta:
         model = ProjectSection
-        fields = ['name', 'slug','detail_url']
+        fields = ['name', 'slug','detail_url','project_set']
         extra_kwargs = {'detail_url': {'lookup_field': 'slug'}}
 
 
