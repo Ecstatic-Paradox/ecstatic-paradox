@@ -97,8 +97,8 @@ class ArticleAPIViewSet(EPBaseAPIViewSet):
     model = Article
     lookup_field = 'slug'
     meta_fields = ['title','detail_url', ]
-    body_fields = ['id','slug','date_published','author']
-    listing_default_fields= ['id','slug',"title","date_published", "detail_url",'author']
+    body_fields = ['id','slug','thumbnail','pdf_file','date_published','author']
+    listing_default_fields= ['id','slug',"title","date_published",'thumbnail','pdf_file', "detail_url",'author']
     def get_queryset(self):
         return self.model.objects.filter(live=True).order_by("-id")
 
