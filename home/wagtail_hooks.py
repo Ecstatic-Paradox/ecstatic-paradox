@@ -42,6 +42,7 @@ from .models import (
     ResearchPaper,
     Project,
     Notification,
+    Gallery
 )
 from .forms import CustomProfileSettingsForm
 
@@ -372,3 +373,14 @@ class BlogAdmin(ModelAdmin):
 
 
 modeladmin_register(BlogAdmin)
+class GalleryAdmin(ModelAdmin):
+    model = Gallery
+    menu_icon = "folder-inverse"
+    menu_label = "Gallery"
+    menu_order = 700
+    list_display = (
+        "thumbnail",
+    )
+
+modeladmin_register(GalleryAdmin)
+

@@ -12,6 +12,8 @@ from rest_framework import serializers, viewsets
 from django.utils.text import Truncator
 
 from .models import (
+    BlogPostPage,
+    Gallery,
     User,
     Article,
     Collaborators,
@@ -41,6 +43,7 @@ def slug_url_pattern(cls):
         path("<slug:slug>/", cls.as_view({"get": "detail_view"}), name="detail"),
         path("find/", cls.as_view({"get": "find_view"}), name="find"),
     ]
+
 
 
 
@@ -231,6 +234,14 @@ class AboutAPIViewSet(BaseAPIViewSet):
         ]
 
 
+class BlogAPIViewSet(BaseAPIViewSet):
+    model = BlogPostPage
+
+class GalleryAPIViewSet(BaseAPIViewSet):
+    model = Gallery
+    body_fields = ["thumbnail"]
+    listing_default_fields = ["thumbnail"]
+
 # api_router.register_endpoint("pages", PagesAPIViewSet)
 api_router.register_endpoint("images", ImagesAPIViewSet)
 api_router.register_endpoint("documents", DocumentsAPIViewSet)
@@ -242,3 +253,5 @@ api_router.register_endpoint("researchpapers", ResearchPaperAPIViewSet)
 api_router.register_endpoint("projects", ProjectAPIViewSet)
 api_router.register_endpoint("projects/sections", ProjectSectionAPIViewSet)
 api_router.register_endpoint("about", AboutAPIViewSet)
+api_router.register_endpoint("blogs", BlogAPIViewSet)
+api_router.register_endpoint("gallery", GalleryAPIViewSet)

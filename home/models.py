@@ -21,7 +21,7 @@ from wagtail.api import APIField
 from wagtail.core import blocks
 from wagtail.core.fields import RichTextField, StreamField
 from wagtail.core.models import Orderable, Page
-from wagtail.images.blocks import ImageChooserBlock
+from wagtail.images.blocks import ImageChooserBlock as DefaultImageChooserBlock
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.search import index
 from wagtail.embeds.blocks import EmbedBlock
@@ -32,6 +32,16 @@ import datetime
 from taggit.models import TaggedItemBase
 from modelcluster.tags import ClusterTaggableManager
 
+
+class ImageChooserBlock(DefaultImageChooserBlock):
+    def get_api_representation(self, value, context=None):
+        if value:
+            return {
+                'id': value.id,
+                'title': value.title,
+                'large': value.get_rendition('width-1000').attrs_dict,
+                # 'thumbnail': value.get_rendition('fill-120x120').attrs_dict,
+            }
 
 class HomePage(Page):
     """Wagtail Base Parent Page class for other Page Classes"""
@@ -476,6 +486,19 @@ class Meeting(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+class Gallery(models.Model):
+    thumbnail = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    panels = [
+        ImageChooserPanel("thumbnail")
+    ]
+    api_fields = [APIField("thumbnail")]
 
 
 class Article(Page):
