@@ -26,8 +26,11 @@ from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.search import index
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.snippets.models import register_snippet
+from wagtail.snippets.edit_handlers import SnippetChooserPanel
 from wagtail.admin.forms import WagtailAdminPageForm
 import datetime
+from taggit.models import TaggedItemBase
+from modelcluster.tags import ClusterTaggableManager
 
 
 class HomePage(Page):
@@ -368,8 +371,8 @@ class ResearchPaper(models.Model, index.Indexed):
     title = models.CharField(max_length=200)
     author = models.ManyToManyField(User)
     date_published = models.DateField()
-    is_highlight = models.BooleanField()
-    is_completed = models.BooleanField()
+    is_highlight = models.BooleanField(default=False)
+    # is_completed = models.BooleanField()
     content = StreamField(
         [
             ("heading", blocks.CharBlock(classname="topics")),
@@ -527,6 +530,45 @@ class Article(Page):
     def author(self):
         return self.owner.get_full_name()
 
+class BlogPostPage(Page):
+    date_created = models.DateTimeField()
+    # title = models.CharField(max_length=300, null=True)
+    thumbnail = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    content = StreamField(
+        [
+            ("heading", blocks.CharBlock(classname="full title")),
+            ("paragraph", blocks.RichTextBlock()),
+            ("image", ImageChooserBlock(icon="image")),
+            ("embedded_video", EmbedBlock(icon="media")),
+        ],
+        null=True,
+        blank=True,
+    )
+    tags = ClusterTaggableManager(through="home.PostPageTag", blank=True)
+
+    content_panels = Page.content_panels + [
+        FieldPanel("date_created"),
+        ImageChooserPanel("thumbnail"),
+        StreamFieldPanel("content", classname="full"),
+        InlinePanel("categories", label="category"),
+        FieldPanel("tags"),
+    ]
+    api_fields = [
+        APIField("date_created"),
+        APIField("content"),
+        APIField("tags"),
+        APIField("owner"),
+        APIField("thumbnail"),
+        APIField("categories"),
+    ]
+
+    parent_page_types = ["home.HomePage"]
 
 # ---------------------Categories
 class CustomSection(models.Model):
@@ -544,31 +586,45 @@ class CustomSection(models.Model):
         return self.name
 
     class Meta:
+        abstract = True
         verbose_name = "Section"
         verbose_name_plural = "Sections"
 
 
 @register_snippet
 class ProgramSection(CustomSection):
-    pass
+    
+    class Meta:
+        verbose_name = "Program Section"
+        verbose_name_plural = "Program Sections"
+    
+
+
 
 
 @register_snippet
 class PublicationSection(CustomSection):
-    pass
-
+    class Meta:
+        verbose_name = "Publication Section"
+        verbose_name_plural = "Publication Sections"
+    
 
 @register_snippet
 class CourseSection(CustomSection):
-    pass
-
+    class Meta:
+        verbose_name = "Course Section"
+        verbose_name_plural = "Course Sections"
+    
 
 @register_snippet
 class ProjectSection(CustomSection):
 
     def __str__(self):
         return self.name
-    pass
+    class Meta:
+        verbose_name = "Project Section"
+        verbose_name_plural = "Project Sections"
+    
 
 
 @register_snippet
@@ -584,3 +640,50 @@ class Notification(models.Model):
 
     def __str__(self) -> str:
         return self.title
+    
+@register_snippet
+class BlogCategory(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, max_length=80)
+
+    panels = [
+        FieldPanel("name"),
+        FieldPanel("slug"),
+    ]
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+
+
+from taggit.models import Tag as TaggitTag
+@register_snippet
+class BlogTag(TaggitTag):
+    class Meta:
+        proxy = True
+        verbose_name = "Blog Tag"
+        verbose_name_plural = "Blog Tags"
+
+
+# Intermediatary Models For Blog ---------------------------------------
+class PostPageBlogCategory(models.Model):
+    page = ParentalKey(
+        "home.BlogPostPage", on_delete=models.CASCADE, related_name="categories"
+    )
+    blog_category = models.ForeignKey(
+        "home.BlogCategory", on_delete=models.CASCADE, related_name="post_pages"
+    )
+
+    panels = [
+        SnippetChooserPanel("blog_category"),
+    ]
+
+    class Meta:
+        unique_together = ("page", "blog_category")
+
+
+class PostPageTag(TaggedItemBase):
+    content_object = ParentalKey("BlogPostPage", related_name="post_tags")

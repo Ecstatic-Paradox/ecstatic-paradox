@@ -30,6 +30,7 @@ from .views import (
 from .models import (
     Attendance,
     Absentee,
+    BlogPostPage,
     Collaborators,
     Course,
     HomePage,
@@ -358,3 +359,16 @@ class CourseAdmin(ModelAdmin):
 
 
 modeladmin_register(CourseAdmin)
+
+class BlogAdmin(ModelAdmin):
+    model = BlogPostPage
+    menu_icon = "folder-inverse"
+    menu_label = "Blogs"
+    menu_order = 700
+    list_display = (
+        "title",
+    )
+    search_fields = ("title", "content")
+
+
+modeladmin_register(BlogAdmin)
