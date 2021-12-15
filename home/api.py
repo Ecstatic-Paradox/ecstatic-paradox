@@ -242,7 +242,7 @@ class GalleryAPIViewSet(BaseAPIViewSet):
     body_fields = ["thumbnail"]
     listing_default_fields = ["thumbnail"]
 
-# api_router.register_endpoint("pages", PagesAPIViewSet)
+#api_router.register_endpoint("pages", PagesAPIViewSet)
 api_router.register_endpoint("images", ImagesAPIViewSet)
 api_router.register_endpoint("documents", DocumentsAPIViewSet)
 api_router.register_endpoint("articles", ArticleAPIViewSet)
@@ -250,7 +250,7 @@ api_router.register_endpoint("webinars", WebinarAPIViewSet)
 api_router.register_endpoint("symposiums", SymposiumAPIViewSet)
 api_router.register_endpoint("courses", CourseAPIViewSet)
 api_router.register_endpoint("researchpapers", ResearchPaperAPIViewSet)
-api_router.register_endpoint("projects", ProjectAPIViewSet)
+api_router.register_endpoint("pojects", ProjectAPIViewSet)
 api_router.register_endpoint("projects/sections", ProjectSectionAPIViewSet)
 api_router.register_endpoint("about", AboutAPIViewSet)
 api_router.register_endpoint("blogs", BlogAPIViewSet)
