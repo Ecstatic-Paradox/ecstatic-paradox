@@ -106,7 +106,7 @@ class User(AbstractUser):
             Absentee.objects.filter(member=self).filter(remarks=None).count()
         )  # Stores True if user has unrecorded leave.
 
-        print("\n\n\n {}: {} \n\n\n".format(state, self))
+        # print("\n\n\n {}: {} \n\n\n".format(state, self))
         if state:
             # If user is absent then remove her from all the groups (admin_access permission)
             # and create a new group with name "oldgrp1_oldgrp2_absentee" so that later she can be reassign to her old groups.

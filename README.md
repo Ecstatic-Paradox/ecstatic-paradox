@@ -51,8 +51,8 @@ Homepage contains basic introductory stuffs [EDIT THIS]
   - django_rest_framework
   - wagtail
 
-### Models Overview
-**NOTE: Use CamelCase for model name and snake_case for fields name**
+<!-- ### Models Overview -->
+<!-- **NOTE: Use CamelCase for model name and snake_case for fields name**
   + **`django.contrib.auth.models.User`**
     Used for the mainly for authentication purposes, OnetoOne extended with `Profile` model. Stores 
     - First Name
@@ -72,23 +72,46 @@ Homepage contains basic introductory stuffs [EDIT THIS]
      - Department 
      - Spectrum `ManytoMany field with **Spectrum** model`
      - Additional Information `Bio type discription to show on Member Profile`  
-     User must have profile to use dashboard, so if logged in user has to profile then, they are redirected to profile create page. 
-  + **`Attendance Issue`**
+     User must have profile to use dashboard, so if logged in user has to profile then, they are redirected to profile create page.  -->
+
+
+### Attendance System Concept
+
+  - **Models**
+
+
+  + `Attendance Issue`
     To store on which days HR opened attendance.
     - Date
     - issuer `HR who opened attendance that day`
     - remarks
+    - is_open
+
+
   + **`Attendance`**
     - issue `Foreign Key of **Attendace Issue** `
     - Member `Foreign Key of **User** model`
     - Status `Boolean either Attended(True) or On Leave(False)`
     - Remarks `Information about why the person was on leave`
+  
   + **`Absentee`**
     Stores the reasons for being absent of absentee member.
     - issue `Date the person was absent, Foreign Key of Attendance Issue Model`
     - Member
     - Remarks
-  + **`Notice`**
+
+  First someone with HR permission (from HR or superuser) issues a attendance.
+  This is a entry in Attendace Issue Model.
+  Then whenever any user logs in to panel. They can find Open Attandance either in sidebar or in dashboard.
+  They have to fill out a captcha and submit to fill out attandance which is stored as entry in Attandance Model.
+  Members from HR can view who filled out attandance and mark members as absent to ask them reason.
+  
+  Only one attandance issue can be open at a time.
+
+
+
+
+  <!-- + **`Notice`**
     - Date
     - Issuer `Foreign Key with` **`django.contrib.auth.models.User`**
     - Description
@@ -147,7 +170,7 @@ Homepage contains basic introductory stuffs [EDIT THIS]
     - Author
     - Date Published
     - Is Published
-    - Content 
+    - Content  -->
  
  
 ### Authentication System

@@ -14,7 +14,16 @@
     <dd>{{ field.value }}</dd>
     {% endfor %}
   </dl>
-  {% endif %} {% if absentee_list %} {% for member in absentee_list %}
+  {% endif %} {% if absentee_list %} 
+
+  <form method="POST" action="/admin/add-member-as-absent/">
+    {% csrf_token %}
+    <input type="hidden" name="ask-all" value="value doesnot matter">
+    <input type="hidden" name="attendance_issue" value={{ instance.id }} >
+    <button class="button"> Ask Reason to all </button>
+  </form>
+ 
+  {% for member in absentee_list %}
   <dt >
       
       <div class="ep_absentee_option_forms">

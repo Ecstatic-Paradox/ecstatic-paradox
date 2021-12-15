@@ -28,7 +28,7 @@ class FillAttendance(TemplateView):
 
     template_name = "home/fill_attendance.html"
     form_class = FillAttendanceForm
-    
+
     def get_context_data(self, **kwargs):
         context = {"form": self.form_class}
         context.update(kwargs)
@@ -38,8 +38,10 @@ class FillAttendance(TemplateView):
         form = FillAttendanceForm(request.POST)
         if form.is_valid():
             try:
-                if request.user and (not bool(request.user.get_unattended_issue())):
-                    print(f"\n\n\n {request.user} \n\n\n {AttendanceIssue.objects.get(is_open=True)} \n\n\n ")
+                if request.user and (bool(request.user.get_unattended_issue())):
+                    print(
+                        f"\n\n\n {request.user} \n\n\n {AttendanceIssue.objects.get(is_open=True)} \n\n\n "
+                    )
                     attendance = Attendance.objects.create(
                         member=request.user,
                         issue_date=AttendanceIssue.objects.get(is_open=True),
@@ -50,7 +52,7 @@ class FillAttendance(TemplateView):
                 print("\n\n {} \n\n ".format(e))
                 return HttpResponseNotFound()
             return redirect("/admin")
-        
+
         else:
             return HttpResponseBadRequest()
 
@@ -78,6 +80,7 @@ class MarkMemberOnLeaveView(View):
             attendance_issue = AttendanceIssue.objects.get(
                 id=request.POST["attendance_issue"]
             )
+
         except User.DoesNotExist or AttendanceIssue.DoesNotExist:
             return HttpResponseNotFound()
 
@@ -98,17 +101,32 @@ class AddMemberasAbsent(View):
     permission_required = ("manage_attendance",)
 
     def post(self, request, *args, **kwargs):
-        try:
-            member_obj = User.objects.get(id=request.POST["member_id"])
+        print(request.POST)
+        if "ask-all" in request.POST:
             attendance_issue = AttendanceIssue.objects.get(
                 id=request.POST["attendance_issue"]
             )
-        except User.DoesNotExist or AttendanceIssue.DoesNotExist:
-            return HttpResponseNotFound()
-        absentee_obj = Absentee.objects.create(
-            issue_date=attendance_issue, member=member_obj
-        )
-        absentee_obj.save()
+            absentee_list = attendance_issue.get_absentee_list()
+
+            for member_obj in absentee_list:
+                absentee_obj = Absentee.objects.create(
+                    issue_date=attendance_issue, member=member_obj
+                )
+                absentee_obj.save()
+        
+        else:
+            try:
+                # if "member_id" in request.POST:
+                member_obj = User.objects.get(id=request.POST.get("member_id",-1))
+                attendance_issue = AttendanceIssue.objects.get(
+                    id=request.POST["attendance_issue"]
+                )
+            except User.DoesNotExist or AttendanceIssue.DoesNotExist:
+                return HttpResponseNotFound()
+            absentee_obj = Absentee.objects.create(
+                issue_date=attendance_issue, member=member_obj
+            )
+            absentee_obj.save()
 
         return redirect(f"/admin/home/attendanceissue/inspect/{ attendance_issue.id }/")
 
@@ -199,11 +217,9 @@ class MembersListView(ListView):
     context_object_name = "members"
     model = User
 
-    
 
 class MemberInspectView(DetailView):
 
-    template_name= "home/member_profile.html"
+    template_name = "home/member_profile.html"
     context_object_name = "member"
     model = User
-
