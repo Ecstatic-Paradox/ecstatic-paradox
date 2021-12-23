@@ -25,6 +25,7 @@ from .models import (
     ProjectSection,
 )
 from .serializers import (
+    BlogPostPageSerializer,
     CollaboratorsSerializer,
     CoreMemberSerializer,
     ProjectSerializer,
@@ -236,6 +237,10 @@ class AboutAPIViewSet(BaseAPIViewSet):
 
 class BlogAPIViewSet(BaseAPIViewSet):
     model = BlogPostPage
+    base_serializer_class = BlogPostPageSerializer
+    
+    def get_queryset(self):
+        return self.model.objects.all().order_by("-id")
 
 class GalleryAPIViewSet(BaseAPIViewSet):
     model = Gallery

@@ -4,7 +4,7 @@ from django.urls import path, reverse
 from django.utils.html import format_html
 from django.templatetags.static import static
 from django.template.loader import render_to_string
-from django.db.models import Q
+from django.db.models import Q, F
 from django.http.response import HttpResponseRedirect
 
 from wagtail.admin.views.account import BaseSettingsPanel
@@ -168,6 +168,10 @@ def register_members_list_menuitem():
         order=200,
     )
 
+@hooks.register("before_serve_page")
+def increment_view_count(page, request, serve_args, serve_kwargs):
+    if page.specific_class == BlogPostPage:
+        BlogPostPage.objects.filter(pk=page.pk).update(view_count=F('view_count') + 1)
 
 # ----------------- Today's Attendace Related --------------------------
 

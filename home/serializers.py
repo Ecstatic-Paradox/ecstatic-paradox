@@ -1,7 +1,7 @@
 from django.db.models import fields
 from rest_framework import serializers
 from wagtail.api.v2.serializers import BaseSerializer, DetailUrlField
-from .models import Project, ProjectSection, ResearchPaper, User, Collaborators
+from .models import BlogPostPage, Project, ProjectSection, ResearchPaper, User, Collaborators
 from  wagtail.users.models import UserProfile
 # from .api import api_router
 
@@ -81,3 +81,24 @@ class CoreMemberSerializer(serializers.ModelSerializer):
         if instance.wagtail_userprofile.avatar:
             return instance.wagtail_userprofile.avatar.url
         return None
+
+class BlogPostPageSerializer(BaseSerializer):
+    content = serializers.SerializerMethodField()
+    meta_fields =[]
+    class Meta:
+        model = BlogPostPage
+        fields = ["view_count", "date_created", "content", "tags", "owner", "thumbnail", ]
+        # fields = "__all__"
+   
+    def get_content(self, instance):
+        ret = []
+        if instance.content :
+            for i in instance.content:
+                ret.append({
+                    'type': i.block_type,
+                    'value': i.render()
+                })
+            return ret
+        return None
+        
+

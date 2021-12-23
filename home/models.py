@@ -555,6 +555,7 @@ class Article(Page):
 
 class BlogPostPage(Page):
     date_created = models.DateTimeField()
+    view_count = models.PositiveBigIntegerField(default=0)
     # title = models.CharField(max_length=300, null=True)
     thumbnail = models.ForeignKey(
         "wagtailimages.Image",
@@ -583,12 +584,13 @@ class BlogPostPage(Page):
         FieldPanel("tags"),
     ]
     api_fields = [
+        APIField("view_count"),
         APIField("date_created"),
         APIField("content"),
         APIField("tags"),
         APIField("owner"),
         APIField("thumbnail"),
-        APIField("categories"),
+        # APIField("categories"),
     ]
 
     parent_page_types = ["home.HomePage"]
