@@ -232,7 +232,7 @@ class AboutAPIViewSet(BaseAPIViewSet):
                 cls.as_view({"get": "collaborators_list"}),
                 name="detail",
             ),
-            path("core-members/", cls.as_view({"get": "members_list"}), name="detail"),
+            path("coremembers/", cls.as_view({"get": "members_list"}), name="detail"),
         ]
 
 
@@ -240,13 +240,37 @@ class BlogAPIViewSet(BaseAPIViewSet):
     model = BlogPostPage
     base_serializer_class = BlogPostPageSerializer
     
-    def detail_view(self, request, pk):
-        self.model.objects.filter(id=pk).update(view_count=F('view_count')+1)
-        return super().detail_view(request, pk)
-
     def get_queryset(self):
         return self.model.objects.all().order_by("-id")
 
+    def pinnedpost_list(self, request):
+        queryset = self.model.objects.filter(is_pinned=True)
+        self.check_query_parameters(queryset)
+        queryset = self.filter_queryset(queryset)
+        queryset = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(queryset, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    def popularpost_list(self, request):
+        queryset = self.model.objects.all().order_by("-view_count")
+        if queryset.count() > 4:
+            queryset = queryset[:4]
+        # self.check_query_parameters(queryset)
+        # queryset = self.filter_queryset(queryset)
+        # queryset = self.paginate_queryset(queryset)
+        serializer = BlogPostPageSerializer(queryset, many=True, context=self.get_serializer_context())
+        return Response(serializer.data)
+    
+    def detail_view(self, request, pk):
+        self.model.objects.filter(id=pk).update(view_count=F('view_count')+1)
+        return super().detail_view(request, pk)
+    
+    @classmethod
+    def get_urlpatterns(cls):
+        return super().get_urlpatterns() + [
+                path("pinned/", cls.as_view({"get": "pinnedpost_list"}), name="pinned_posts",),
+                path("popular/", cls.as_view({"get": "popularpost_list"}), name="popular_posts",),
+        ]  
     
 
 class GalleryAPIViewSet(BaseAPIViewSet):

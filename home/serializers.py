@@ -87,7 +87,7 @@ class BlogPostPageSerializer(BaseSerializer):
     meta_fields =[]
     class Meta:
         model = BlogPostPage
-        fields = ["view_count", "date_created", "content", "tags", "owner", "thumbnail", ]
+        fields = ["view_count", "date_created", "content", "tags", "owner", "thumbnail", "is_pinned"]
         # fields = "__all__"
    
     def get_content(self, instance):
