@@ -5,11 +5,12 @@ from wagtail.api.v2.views import PagesAPIViewSet
 from wagtail.api.v2.router import WagtailAPIRouter
 from wagtail.images.api.v2.views import ImagesAPIViewSet
 from wagtail.documents.api.v2.views import DocumentsAPIViewSet
-
+from django.shortcuts import get_object_or_404
 from django.urls import path
 from wagtail.api.v2.views import BaseAPIViewSet, PagesAPIViewSet
 from rest_framework import serializers, viewsets
 from django.utils.text import Truncator
+from django.db.models import F
 
 from .models import (
     BlogPostPage,
@@ -239,6 +240,10 @@ class BlogAPIViewSet(BaseAPIViewSet):
     model = BlogPostPage
     base_serializer_class = BlogPostPageSerializer
     
+    def detail_view(self, request, pk):
+        self.model.objects.filter(id=pk).update(view_count=F('view_count')+1)
+        return super().detail_view(request, pk)
+
     def get_queryset(self):
         return self.model.objects.all().order_by("-id")
 
