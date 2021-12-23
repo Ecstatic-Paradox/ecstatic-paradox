@@ -247,6 +247,8 @@ class BlogAPIViewSet(BaseAPIViewSet):
     def get_queryset(self):
         return self.model.objects.all().order_by("-id")
 
+    
+
 class GalleryAPIViewSet(BaseAPIViewSet):
     model = Gallery
     body_fields = ["thumbnail"]
