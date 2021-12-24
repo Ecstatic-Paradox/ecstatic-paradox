@@ -3,6 +3,7 @@ from rest_framework import serializers
 from wagtail.api.v2.serializers import BaseSerializer, DetailUrlField, PageSerializer
 from .models import BlogPostPage, Project, ProjectSection, ResearchPaper, User, Collaborators
 from  wagtail.users.models import UserProfile
+from django.utils.text import Truncator
 # from .api import api_router
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -29,14 +30,16 @@ class ProjectListSerializer(BaseSerializer):
     detail_url = DetailUrlField(read_only=True)
     title = serializers.CharField()
     thumbnail = serializers.ImageField()
-    description = serializers.CharField()
+    description = serializers.SerializerMethodField()
     # members = AuthorSerializer(many=True, read_only=True)
     meta_fields =[]
 
     class Meta:
         model = Project
         fields =["title","detail_url","slug","sections","thumbnail","description"]
-        
+    
+    def get_description(self, instance):
+        return Truncator(instance.description).chars(40)
 
 class ProjectSectionSerializer(BaseSerializer):  
     detail_url = DetailUrlField(read_only=True)
