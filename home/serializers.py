@@ -1,6 +1,6 @@
 from django.db.models import fields
 from rest_framework import serializers
-from wagtail.api.v2.serializers import BaseSerializer, DetailUrlField
+from wagtail.api.v2.serializers import BaseSerializer, DetailUrlField, PageSerializer
 from .models import BlogPostPage, Project, ProjectSection, ResearchPaper, User, Collaborators
 from  wagtail.users.models import UserProfile
 # from .api import api_router
@@ -82,12 +82,14 @@ class CoreMemberSerializer(serializers.ModelSerializer):
             return instance.wagtail_userprofile.avatar.url
         return None
 
-class BlogPostPageSerializer(BaseSerializer):
+class BlogPostPageSerializer(PageSerializer):
     content = serializers.SerializerMethodField()
+    thumbnail = serializers.ImageField()
     meta_fields =[]
+    child_serializer_classes= {} #added just to make it work, idk why it works
     class Meta:
         model = BlogPostPage
-        fields = ["view_count", "date_created", "content", "tags", "owner", "thumbnail", "is_pinned"]
+        fields = ["view_count", "date_created", "content", "tags", "thumbnail", "is_pinned"]
         # fields = "__all__"
    
     def get_content(self, instance):

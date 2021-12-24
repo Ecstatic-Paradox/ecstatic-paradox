@@ -248,7 +248,7 @@ class BlogAPIViewSet(BaseAPIViewSet):
         self.check_query_parameters(queryset)
         queryset = self.filter_queryset(queryset)
         queryset = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.base_serializer_class(queryset, many=True)
         return self.get_paginated_response(serializer.data)
 
     def popularpost_list(self, request):
