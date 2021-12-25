@@ -88,11 +88,11 @@ class CoreMemberSerializer(serializers.ModelSerializer):
 class BlogPostPageSerializer(PageSerializer):
     content = serializers.SerializerMethodField()
     thumbnail = serializers.ImageField()
-    meta_fields =[]
+    meta_fields =["detail_url"]
     child_serializer_classes= {} #added just to make it work, idk why it works
     class Meta:
         model = BlogPostPage
-        fields = ["view_count", "date_created", "content", "tags", "thumbnail", "is_pinned"]
+        fields = ["title","view_count", "date_created", "content", "tags", "thumbnail", "is_pinned"]
         # fields = "__all__"
    
     def get_content(self, instance):

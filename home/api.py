@@ -47,6 +47,13 @@ def slug_url_pattern(cls):
     ]
 
 
+"""" 
+ Note: Usage of
+    1. meta_fields is to include fields in meta in detail view (/api/<endpoint>/<id>)
+    2. body_fields is to include fields in body in detail view
+    3. listing default fields inlcudes in list view 
+"""
+
 
 
 class EPBaseAPIViewSet(BaseAPIViewSet):
@@ -103,12 +110,17 @@ class ArticleAPIViewSet(EPBaseAPIViewSet):
     lookup_field = 'slug'
     meta_fields = ['title','detail_url', ]
     body_fields = ['id','slug','thumbnail','pdf_file','date_published','author']
-    listing_default_fields= ['id','slug',"title","date_published",'thumbnail','pdf_file', "detail_url",'author']
+    listing_default_fields= ['id','slug',"title","date_published",'thumbnail', "detail_url",'author']
     def get_queryset(self):
         return self.model.objects.filter(live=True).order_by("-id")
 
 
 class WebinarAPIViewSet(BaseAPIViewSet):
+    meta_fields = ['id','title','detail_url', ]
+    
+    body_fields = ['id', 'date', 'thumbnail','youtube_link', 'registration_form', 'description']
+
+    listing_default_fields = ['title', 'detail_url', 'id', 'date', 'thumbnail']
     model = Webinar
 
     def get_queryset(self):
@@ -116,6 +128,12 @@ class WebinarAPIViewSet(BaseAPIViewSet):
 
 
 class SymposiumAPIViewSet(BaseAPIViewSet):
+    meta_fields = ['id','title','detail_url', ]
+    
+    body_fields = ['id', 'date', 'thumbnail','youtube_link', 'registration_form', 'description']
+
+    listing_default_fields = ['title', 'detail_url', 'id', 'date', 'thumbnail']
+
     model = Symposium
 
     def get_queryset(self):
@@ -123,6 +141,12 @@ class SymposiumAPIViewSet(BaseAPIViewSet):
 
 
 class CourseAPIViewSet(BaseAPIViewSet):
+    meta_fields = ['id','title','detail_url', ]
+    
+    body_fields = ['id', 'date', 'thumbnail','youtube_link', 'registration_form', 'description']
+
+    listing_default_fields = ['title', 'detail_url', 'id', 'date', 'thumbnail']
+
     model = Course
 
     def get_queryset(self):

@@ -297,16 +297,6 @@ class Webinar(models.Model, index.Indexed):
         FieldPanel("youtube_link"),
         FieldPanel("registration_form"),
     ]
-
-    api_fields = [
-        APIField("date"),
-        APIField("title"),
-        APIField("description"),
-        APIField("thumbnail"),
-        APIField("youtube_link"),
-        APIField("registration_form"),
-    ]
-
     search_fields = [
         index.SearchField("title", partial_match=True),
         index.SearchField("description", partial_match=True),
