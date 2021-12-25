@@ -260,10 +260,13 @@ class AboutAPIViewSet(BaseAPIViewSet):
         ]
 
 
-class BlogAPIViewSet(BaseAPIViewSet):
+class BlogAPIViewSet(EPBaseAPIViewSet):
+    
     model = BlogPostPage
     base_serializer_class = BlogPostPageSerializer
-    
+    lookup_field = "slug"
+    lookup_url_kwarg = "slug"
+
     def get_queryset(self):
         return self.model.objects.all().order_by("-id")
 
@@ -279,22 +282,24 @@ class BlogAPIViewSet(BaseAPIViewSet):
         queryset = self.model.objects.all().order_by("-view_count")
         if queryset.count() > 4:
             queryset = queryset[:4]
-        # self.check_query_parameters(queryset)
-        # queryset = self.filter_queryset(queryset)
-        # queryset = self.paginate_queryset(queryset)
+        self.check_query_parameters(queryset)
+        queryset = self.filter_queryset(queryset)
+        queryset = self.paginate_queryset(queryset)
         serializer = BlogPostPageSerializer(queryset, many=True, context=self.get_serializer_context())
         return Response(serializer.data)
     
-    def detail_view(self, request, pk):
+    def detail_view(self, request, pk=None, slug=None):
+        if slug:
+            pk = self.model.objects.get(slug=slug).id
         self.model.objects.filter(id=pk).update(view_count=F('view_count')+1)
         return super().detail_view(request, pk)
     
     @classmethod
     def get_urlpatterns(cls):
-        return super().get_urlpatterns() + [
+        return [
                 path("pinned/", cls.as_view({"get": "pinnedpost_list"}), name="pinned_posts",),
                 path("popular/", cls.as_view({"get": "popularpost_list"}), name="popular_posts",),
-        ]  
+        ] +super().get_urlpatterns() 
     
 
 class GalleryAPIViewSet(BaseAPIViewSet):

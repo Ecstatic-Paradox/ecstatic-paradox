@@ -42,7 +42,7 @@ class ProjectListSerializer(BaseSerializer):
         return Truncator(instance.description).chars(40)
 
 class ProjectSectionSerializer(BaseSerializer):  
-    detail_url = DetailUrlField(read_only=True)
+    # detail_url = DetailUrlField(read_only=True)
     # detail_url = serializers.HyperlinkedRelatedField(
     #     lookup_field = 'slug', view_name='projectsectionapiviewset', read_only=True
     # )
@@ -52,7 +52,7 @@ class ProjectSectionSerializer(BaseSerializer):
     class Meta:
         model = ProjectSection
         fields = ["id",'name', 'slug','detail_url','project_set']
-        extra_kwargs = {'detail_url': {'lookup_field': 'slug'}}
+        # extra_kwargs = {'detail_url': {'lookup_field': 'slug'}}
 
 
 
@@ -87,13 +87,16 @@ class CoreMemberSerializer(serializers.ModelSerializer):
 
 class BlogPostPageSerializer(PageSerializer):
     content = serializers.SerializerMethodField()
+    detail_url = DetailUrlField(read_only=True)
     thumbnail = serializers.ImageField()
-    meta_fields =["detail_url"]
+    meta_fields =["title","detail_url"]
     child_serializer_classes= {} #added just to make it work, idk why it works
     class Meta:
         model = BlogPostPage
-        fields = ["title","view_count", "date_created", "content", "tags", "thumbnail", "is_pinned"]
+        fields = ["title","slug","detail_url","view_count", "date_created", "content", "tags", "thumbnail", "is_pinned"]
         # fields = "__all__"
+        extra_kwargs = {'detail_url': {'lookup_field': 'slug'}}
+        
    
     def get_content(self, instance):
         ret = []
