@@ -285,7 +285,13 @@ class Webinar(models.Model, index.Indexed):
     date = models.DateField()
     title = models.CharField(max_length=200)
     description = models.TextField()
-    thumbnail = models.ImageField(upload_to="webinar_thumbnails")
+    thumbnail = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
     youtube_link = models.TextField()
     registration_form = models.TextField()
 
@@ -293,7 +299,7 @@ class Webinar(models.Model, index.Indexed):
         FieldPanel("date"),
         FieldPanel("title"),
         FieldPanel("description"),
-        FieldPanel("thumbnail"),
+        ImageChooserPanel("thumbnail"),
         FieldPanel("youtube_link"),
         FieldPanel("registration_form"),
     ]
@@ -308,7 +314,13 @@ class Symposium(models.Model, index.Indexed):
     date = models.DateField()
     title = models.CharField(max_length=200)
     description = models.TextField()
-    thumbnail = models.ImageField(upload_to="Symposium_thumbnails")
+    thumbnail =models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
     youtube_link = models.TextField()
     registration_form = models.TextField()
 
@@ -316,7 +328,7 @@ class Symposium(models.Model, index.Indexed):
         FieldPanel("date"),
         FieldPanel("title"),
         FieldPanel("description"),
-        FieldPanel("thumbnail"),
+        ImageChooserPanel("thumbnail"),
         FieldPanel("youtube_link"),
         FieldPanel("registration_form"),
     ]
@@ -340,7 +352,13 @@ class Course(models.Model, index.Indexed):
     date = models.DateField()
     title = models.CharField(max_length=200)
     description = models.TextField()
-    thumbnail = models.ImageField(upload_to="course_thumbnails")
+    thumbnail = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
     youtube_link = models.TextField()
     registration_form = models.TextField()
 
@@ -348,7 +366,7 @@ class Course(models.Model, index.Indexed):
         FieldPanel("date"),
         FieldPanel("title"),
         FieldPanel("description"),
-        FieldPanel("thumbnail"),
+        ImageChooserPanel("thumbnail"),
         FieldPanel("youtube_link"),
         FieldPanel("registration_form"),
     ]
@@ -420,7 +438,13 @@ class Project(models.Model, index.Indexed):
     members = models.ManyToManyField(User)
     start_date = models.DateField()
     end_date = models.DateField()
-    thumbnail = models.ImageField()
+    thumbnail =models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
     description = models.TextField()
     sections = models.ManyToManyField("home.ProjectSection", blank=True)
     slug = models.SlugField(unique=True)
@@ -456,7 +480,7 @@ class Project(models.Model, index.Indexed):
         FieldPanel("end_date"),
         FieldPanel("members"),
         FieldPanel("description"),
-        FieldPanel("thumbnail"),
+        ImageChooserPanel("thumbnail"),
         StreamFieldPanel("content", classname="full"),
         FieldPanel("sections", widget=forms.CheckboxSelectMultiple),
         FieldPanel("slug"),
@@ -507,7 +531,13 @@ class Article(Page):
 
     pdf_file = models.FileField(upload_to='article_files', null=True)
     sections = ParentalManyToManyField("home.PublicationSection", blank=True)
-    thumbnail = models.ImageField(upload_to='article_thumbnails', null=True)
+    thumbnail = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
 
 
     # API configuration
@@ -530,7 +560,7 @@ class Article(Page):
     content_panels = Page.content_panels + [
         FieldPanel("date_published"),
         FieldPanel("pdf_file"),
-        FieldPanel("thumbnail"),
+        ImageChooserPanel("thumbnail"),
         # FieldPanel("author"),
         # FieldPanel("slug"),
 
