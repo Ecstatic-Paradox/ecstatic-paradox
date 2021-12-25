@@ -113,7 +113,7 @@ class BlogPostPageSerializer(PageSerializer):
     detail_url = DetailUrlField(read_only=True)
     thumbnail = serializers.ImageField()
     owner = AuthorSerializer(read_only=True)
-    meta_fields = ["title", "detail_url","date_created", "owner"]
+    meta_fields = ["title","slug","detail_url","date_created", "owner"]
 
     child_serializer_classes = {}  # added just to make it work, idk why it works
 
@@ -122,7 +122,7 @@ class BlogPostPageSerializer(PageSerializer):
         fields = [
             "title",
             "seo_title",
-            "date_created"
+            "date_created",
             "slug",
             "detail_url",
             "view_count",
