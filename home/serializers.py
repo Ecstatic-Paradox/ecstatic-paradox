@@ -36,6 +36,7 @@ class ProjectSerializer(BaseSerializer):
     description = serializers.CharField()
     members = AuthorSerializer(many=True, read_only=True)
     meta_fields = []
+    child_serializer_classes = {}  # added just to make it work, idk why it works
 
     class Meta:
         model = Project
@@ -58,7 +59,8 @@ class ProjectListSerializer(BaseSerializer):
     description = serializers.SerializerMethodField()
     # members = AuthorSerializer(many=True, read_only=True)
     meta_fields = []
-
+    child_serializer_classes = {}  # added just to make it work, idk why it works
+    
     class Meta:
         model = Project
         fields = ["title", "detail_url", "slug", "sections", "thumbnail", "description"]
