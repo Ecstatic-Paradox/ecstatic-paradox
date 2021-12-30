@@ -282,7 +282,7 @@ class Collaborators(models.Model):
 
 class Webinar(models.Model, index.Indexed):
     date_added = models.DateField(auto_now_add=True)
-    date = models.DateField()
+    program_date = models.DateTimeField()
     title = models.CharField(max_length=200)
     description = models.TextField()
     thumbnail = models.ForeignKey(
@@ -296,7 +296,7 @@ class Webinar(models.Model, index.Indexed):
     registration_form = models.TextField()
 
     panels = [
-        FieldPanel("date"),
+        FieldPanel("program_date"),
         FieldPanel("title"),
         FieldPanel("description"),
         ImageChooserPanel("thumbnail"),
@@ -391,6 +391,7 @@ class ResearchPaper(models.Model, index.Indexed):
     date_published = models.DateField()
     is_highlight = models.BooleanField(default=False)
     # is_completed = models.BooleanField()
+    description = models.TextField()
     content = StreamField(
         [
             ("heading", blocks.CharBlock(classname="topics")),
@@ -406,13 +407,16 @@ class ResearchPaper(models.Model, index.Indexed):
         blank=True,)
 
     view = models.BigIntegerField(default=0)
+    slug = models.SlugField(unique=True)
 
     panels = [
         FieldPanel("title"),
         FieldPanel("author"),
         FieldPanel("date_published"),
+        FieldPanel("description"),
         StreamFieldPanel("content", classname="full"),
         StreamFieldPanel("refrences", classname="full"),
+        FieldPanel("slug"),
     ]
 
     api_fields = [
