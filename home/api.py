@@ -169,7 +169,7 @@ class ProjectAPIViewSet(EPBaseAPIViewSet):
     model = Project
     base_serializer_class = ProjectSerializer
     meta_fields = ['sections'] #detail_url
-    body_fields = ["id","slug", "detail_url"]
+    body_fields = ["id","slug", "detail_url", "thumbnail"]
     listing_default_fields  = ['id','title','thumbnail','slug','detail_url']
     lookup_field = "slug"
     lookup_url_kwarg = "slug"

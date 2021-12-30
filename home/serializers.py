@@ -1,7 +1,9 @@
+from typing import Type
 from django.db.models import fields
 from django.db.models.query_utils import select_related_descend
 from rest_framework import serializers
-from wagtail.api.v2.serializers import BaseSerializer, DetailUrlField, PageSerializer
+from wagtail import images
+from wagtail.api.v2.serializers import BaseSerializer, DetailUrlField, PageSerializer, TypeField
 from .models import (
     BlogPostPage,
     Project,
@@ -14,7 +16,8 @@ from wagtail.users.models import UserProfile
 from django.utils.text import Truncator
 
 # from .api import api_router
-from wagtail.images.api.fields import ImageRenditionField
+from wagtail.images.api.v2.serializers import ImageSerializer
+from wagtail.images.models import Image
 
 class AuthorSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField()
@@ -51,11 +54,22 @@ class ProjectSerializer(BaseSerializer):
             return ret
         return None
 
+from wagtail.images.api.v2.serializers import ImageDownloadUrlField
+class CustomThumbnailSerializer(BaseSerializer):
+    meta_fields = ['detail_url', 'download_url']
+    download_url = ImageDownloadUrlField()
+    detail_url =DetailUrlField(read_only=True)
+    
+    class Meta:
+        model = Image
+        fields = ['id', 'title', 'detail_url', 'download_url']
+
 class ProjectListSerializer(BaseSerializer):
     sections = serializers.StringRelatedField(many=True)
     detail_url = DetailUrlField(read_only=True)
     title = serializers.CharField()
-    thumbnail = ImageRenditionField(filter_spec=['url', 'alt'])
+    thumbnail = CustomThumbnailSerializer()
+    # thumbnail = ImageRenditionField(filter_spec=['url', 'alt'])
     description = serializers.SerializerMethodField()
     # members = AuthorSerializer(many=True, read_only=True)
     meta_fields = []
