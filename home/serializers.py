@@ -150,7 +150,7 @@ class CoreMemberSerializer(serializers.ModelSerializer):
 class BlogPostPageSerializer(PageSerializer):
     content = serializers.SerializerMethodField()
     detail_url = DetailUrlField(read_only=True)
-    # thumbnail = serializers.ImageField()
+    thumbnail = CustomThumbnailSerializer()
     owner = AuthorSerializer(read_only=True)
     meta_fields = ["title","slug","detail_url","date_created", "owner"]
 
