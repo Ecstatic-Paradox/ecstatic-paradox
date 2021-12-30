@@ -118,9 +118,9 @@ class ArticleAPIViewSet(EPBaseAPIViewSet):
 class WebinarAPIViewSet(BaseAPIViewSet):
     meta_fields = ['id','title','detail_url', ]
     
-    body_fields = ['id', 'date', 'thumbnail','youtube_link', 'registration_form', 'description']
+    body_fields = ['id', 'program_date', 'thumbnail','youtube_link', 'registration_form', 'description']
 
-    listing_default_fields = ['title', 'detail_url', 'id', 'date', 'thumbnail']
+    listing_default_fields = ['title', 'detail_url', 'id', 'program_date', 'thumbnail', 'description' ,'youtube_link']
     model = Webinar
 
     def get_queryset(self):
@@ -132,7 +132,7 @@ class SymposiumAPIViewSet(BaseAPIViewSet):
     
     body_fields = ['id', 'date', 'thumbnail','youtube_link', 'registration_form', 'description']
 
-    listing_default_fields = ['title', 'detail_url', 'id', 'date', 'thumbnail']
+    listing_default_fields = ['title', 'detail_url', 'id', 'date', 'thumbnail', 'description', 'youtube_link']
 
     model = Symposium
 
@@ -145,7 +145,7 @@ class CourseAPIViewSet(BaseAPIViewSet):
     
     body_fields = ['id', 'date', 'thumbnail','youtube_link', 'registration_form', 'description']
 
-    listing_default_fields = ['title', 'detail_url', 'id', 'date', 'thumbnail']
+    listing_default_fields = ['title', 'detail_url', 'id', 'date', 'thumbnail', 'description']
 
     model = Course
 
@@ -153,7 +153,11 @@ class CourseAPIViewSet(BaseAPIViewSet):
         return self.model.objects.all().order_by("-id")
 
 
-class ResearchPaperAPIViewSet(BaseAPIViewSet):
+class ResearchPaperAPIViewSet(EPBaseAPIViewSet):
+    meta_fields = ['id', 'title', 'detail_url']
+    body_fields = ['date_published', 'view', 'author', 'description','is_highlight', 'content', 'refrences', 'slug']
+    listing_default_fields = ['title', 'detail_url', "view",'author','slug', 'id', 'date_published', 'thumbnail', 'description']
+    lookup_field = "slug"
     model = ResearchPaper
     base_serializer_class = ResearchPaperSerializer
 
@@ -166,7 +170,7 @@ class ProjectAPIViewSet(EPBaseAPIViewSet):
     base_serializer_class = ProjectSerializer
     meta_fields = ['sections'] #detail_url
     body_fields = ["id","slug", "detail_url"]
-    listing_default_fields  = ['id','title','thumbnail','slug']
+    listing_default_fields  = ['id','title','thumbnail','slug','detail_url']
     lookup_field = "slug"
     lookup_url_kwarg = "slug"
 

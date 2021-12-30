@@ -306,7 +306,7 @@ class WebinarAdmin(ModelAdmin):
     model = Webinar
     menu_label = "Webinar"
     menu_icon = "pilcrow"
-    list_display = ("title", "date")
+    list_display = ("title", "program_date")
     list_filter = ("date_added",)
     search_fields = ("title", "description")
 

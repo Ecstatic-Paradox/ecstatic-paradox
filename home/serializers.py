@@ -1,4 +1,5 @@
 from django.db.models import fields
+from django.db.models.query_utils import select_related_descend
 from rest_framework import serializers
 from wagtail.api.v2.serializers import BaseSerializer, DetailUrlField, PageSerializer
 from .models import (
@@ -16,16 +17,22 @@ from django.utils.text import Truncator
 
 
 class AuthorSerializer(serializers.ModelSerializer):
+    avatar = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "fb_profile_link"]
+        fields = ["first_name", "last_name", "fb_profile_link","avatar"]
 
+    def get_avatar(self, instance):
+        if instance.wagtail_userprofile.avatar:
+            return instance.wagtail_userprofile.avatar
+        return None
 
 class ProjectSerializer(BaseSerializer):
     sections = serializers.StringRelatedField(many=True)
     detail_url = DetailUrlField(read_only=True)
+    content = serializers.SerializerMethodField()
     title = serializers.CharField()
-    thumbnail = serializers.ImageField()
+    # thumbnail = serializers.ImageField()
     description = serializers.CharField()
     members = AuthorSerializer(many=True, read_only=True)
     meta_fields = []
@@ -35,12 +42,19 @@ class ProjectSerializer(BaseSerializer):
         fields = "__all__"
         # extra_kwargs = {'detail_url': {'lookup_field': 'slug'}}
 
+    def get_content(self, instance):
+        ret = []
+        if instance.content:
+            for i in instance.content:
+                ret.append({"type": i.block_type, "value": i.render()})
+            return ret
+        return None
 
 class ProjectListSerializer(BaseSerializer):
     sections = serializers.StringRelatedField(many=True)
     detail_url = DetailUrlField(read_only=True)
     title = serializers.CharField()
-    thumbnail = serializers.ImageField()
+    # thumbnail = serializers.ImageField()
     description = serializers.SerializerMethodField()
     # members = AuthorSerializer(many=True, read_only=True)
     meta_fields = []
@@ -69,10 +83,19 @@ class ProjectSectionSerializer(BaseSerializer):
 
 class ResearchPaperSerializer(BaseSerializer):
     author = AuthorSerializer(many=True, read_only=True)
-
+    content = serializers.SerializerMethodField()
     class Meta:
         model = ResearchPaper
         fields = "__all__"
+    
+    def get_content(self, instance):
+        ret = []
+        if instance.content:
+            for i in instance.content:
+                ret.append({"type": i.block_type, "value": i.render()})
+            return ret
+        return None
+
 
 
 class CollaboratorsSerializer(serializers.ModelSerializer):
@@ -111,7 +134,7 @@ class CoreMemberSerializer(serializers.ModelSerializer):
 class BlogPostPageSerializer(PageSerializer):
     content = serializers.SerializerMethodField()
     detail_url = DetailUrlField(read_only=True)
-    thumbnail = serializers.ImageField()
+    # thumbnail = serializers.ImageField()
     owner = AuthorSerializer(read_only=True)
     meta_fields = ["title","slug","detail_url","date_created", "owner"]
 
