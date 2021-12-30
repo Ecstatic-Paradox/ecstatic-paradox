@@ -55,7 +55,7 @@ class ProjectListSerializer(BaseSerializer):
     sections = serializers.StringRelatedField(many=True)
     detail_url = DetailUrlField(read_only=True)
     title = serializers.CharField()
-    thumbnail = ImageRenditionField()
+    thumbnail = ImageRenditionField(filter_spec=['url', 'alt'])
     description = serializers.SerializerMethodField()
     # members = AuthorSerializer(many=True, read_only=True)
     meta_fields = []
