@@ -14,7 +14,7 @@ from wagtail.users.models import UserProfile
 from django.utils.text import Truncator
 
 # from .api import api_router
-
+from wagtail.images.api.fields import ImageRenditionField
 
 class AuthorSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField()
@@ -55,7 +55,7 @@ class ProjectListSerializer(BaseSerializer):
     sections = serializers.StringRelatedField(many=True)
     detail_url = DetailUrlField(read_only=True)
     title = serializers.CharField()
-    # thumbnail = serializers.ImageField()
+    thumbnail = ImageRenditionField()
     description = serializers.SerializerMethodField()
     # members = AuthorSerializer(many=True, read_only=True)
     meta_fields = []
