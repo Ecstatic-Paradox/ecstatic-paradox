@@ -155,7 +155,7 @@ class CourseAPIViewSet(BaseAPIViewSet):
 
 class ResearchPaperAPIViewSet(EPBaseAPIViewSet):
     meta_fields = ['id', 'title', 'detail_url']
-    body_fields = ['date_published', 'view', 'author', 'description','is_highlight', 'content', 'refrences', 'slug']
+    body_fields = ['date_published', 'view', 'author', 'description','is_highlight', 'content', 'refrences', 'slug', "thumbnail"]
     listing_default_fields = ['title', 'detail_url', "view",'author','slug', 'id', 'date_published', 'thumbnail', 'description']
     lookup_field = "slug"
     model = ResearchPaper
@@ -167,7 +167,7 @@ class ResearchPaperAPIViewSet(EPBaseAPIViewSet):
     def detail_view(self, request, pk=None, slug=None):
         if slug:
             pk = self.model.objects.get(slug=slug).id
-        self.model.objects.filter(id=pk).update(view_count=F('view_count')+1)
+        self.model.objects.filter(id=pk).update(view=F('view')+1)
         return super().detail_view(request, pk=pk, slug=slug)
     
 

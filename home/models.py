@@ -421,7 +421,7 @@ class ResearchPaper(models.Model, index.Indexed):
         FieldPanel("author"),
         FieldPanel("date_published"),
         FieldPanel("description"),
-        FieldPanel("thumbnail"),
+        ImageChooserPanel("thumbnail"),
         StreamFieldPanel("content", classname="full"),
         StreamFieldPanel("refrences", classname="full"),
         FieldPanel("slug"),
