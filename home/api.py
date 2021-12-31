@@ -164,6 +164,12 @@ class ResearchPaperAPIViewSet(EPBaseAPIViewSet):
     def get_queryset(self):
         return self.model.objects.all().order_by("-id")
 
+    def detail_view(self, request, pk=None, slug=None):
+        if slug:
+            pk = self.model.objects.get(slug=slug).id
+        self.model.objects.filter(id=pk).update(view_count=F('view_count')+1)
+        return super().detail_view(request, pk=pk, slug=slug)
+    
 
 class ProjectAPIViewSet(EPBaseAPIViewSet):
     model = Project
