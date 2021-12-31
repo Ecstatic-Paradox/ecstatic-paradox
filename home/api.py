@@ -155,7 +155,7 @@ class CourseAPIViewSet(BaseAPIViewSet):
 
 class ResearchPaperAPIViewSet(EPBaseAPIViewSet):
     meta_fields = ['id', 'title', 'detail_url']
-    body_fields = ['date_published', 'view', 'author', 'description','is_highlight', 'content', 'refrences', 'slug']
+    body_fields = ['date_published', 'view', 'author', 'description','is_highlight', 'content', 'refrences', 'slug', "thumbnail"]
     listing_default_fields = ['title', 'detail_url', "view",'author','slug', 'id', 'date_published', 'thumbnail', 'description']
     lookup_field = "slug"
     model = ResearchPaper
@@ -164,6 +164,12 @@ class ResearchPaperAPIViewSet(EPBaseAPIViewSet):
     def get_queryset(self):
         return self.model.objects.all().order_by("-id")
 
+    def detail_view(self, request, pk=None, slug=None):
+        if slug:
+            pk = self.model.objects.get(slug=slug).id
+        self.model.objects.filter(id=pk).update(view=F('view')+1)
+        return super().detail_view(request, pk=pk, slug=slug)
+    
 
 class ProjectAPIViewSet(EPBaseAPIViewSet):
     model = Project
@@ -242,7 +248,7 @@ class AboutAPIViewSet(BaseAPIViewSet):
         return Response(serializer.data)
 
     def members_list(self, req):
-        queryset = User.objects.all().filter(is_core_member=True)
+        queryset = User.objects.all()
         serializer = CoreMemberSerializer(
             queryset, many=True, context=self.get_serializer_context()
         )

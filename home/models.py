@@ -391,6 +391,13 @@ class ResearchPaper(models.Model, index.Indexed):
     date_published = models.DateField()
     is_highlight = models.BooleanField(default=False)
     # is_completed = models.BooleanField()
+    thumbnail = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
     description = models.TextField()
     content = StreamField(
         [
@@ -414,6 +421,7 @@ class ResearchPaper(models.Model, index.Indexed):
         FieldPanel("author"),
         FieldPanel("date_published"),
         FieldPanel("description"),
+        ImageChooserPanel("thumbnail"),
         StreamFieldPanel("content", classname="full"),
         StreamFieldPanel("refrences", classname="full"),
         FieldPanel("slug"),
