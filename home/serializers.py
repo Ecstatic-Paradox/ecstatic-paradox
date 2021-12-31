@@ -128,7 +128,10 @@ class AvatarSerializer(serializers.ModelSerializer):
 
 class CoreMemberSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField()
-
+    user_department = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='department_title'
+    )
     class Meta:
         model = User
         fields = [
@@ -139,6 +142,7 @@ class CoreMemberSerializer(serializers.ModelSerializer):
             "user_department",
             "fb_profile_link",
             "avatar",
+            "is_core_member"
         ]
 
     def get_avatar(self, instance):

@@ -248,7 +248,7 @@ class AboutAPIViewSet(BaseAPIViewSet):
         return Response(serializer.data)
 
     def members_list(self, req):
-        queryset = User.objects.all().filter(is_core_member=True)
+        queryset = User.objects.all()
         serializer = CoreMemberSerializer(
             queryset, many=True, context=self.get_serializer_context()
         )
