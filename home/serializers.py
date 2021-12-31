@@ -27,7 +27,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def get_avatar(self, instance):
         if instance.wagtail_userprofile.avatar:
-            return instance.wagtail_userprofile.avatar
+            return instance.wagtail_userprofile.avatar.url
         return None
 
 class ProjectSerializer(BaseSerializer):
