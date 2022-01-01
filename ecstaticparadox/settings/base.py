@@ -184,7 +184,8 @@ WAGTAIL_USER_CUSTOM_FIELDS = [
     "institution",
     "fb_profile_link",
     "bio",
-    "designation"
+    "designation",
+    "is_core_member"
 ]
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
