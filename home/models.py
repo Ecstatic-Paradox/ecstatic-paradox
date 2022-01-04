@@ -590,6 +590,7 @@ class BlogPostPage(Page):
     view_count = models.PositiveBigIntegerField(default=0)
     # title = models.CharField(max_length=300, null=True)
     is_pinned = models.BooleanField(default=False)
+    description = models.TextField()
     thumbnail = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
@@ -611,6 +612,7 @@ class BlogPostPage(Page):
 
     content_panels = Page.content_panels + [
         FieldPanel("date_created"),
+        FieldPanel("description"),
         FieldPanel("is_pinned"),
         ImageChooserPanel("thumbnail"),
         StreamFieldPanel("content", classname="full"),
@@ -625,6 +627,7 @@ class BlogPostPage(Page):
         APIField("owner"),
         APIField("thumbnail"),
         APIField("is_pinned"),
+        APIField("description"),
         # APIField("categories"),
     ]
 

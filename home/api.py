@@ -275,7 +275,8 @@ class BlogAPIViewSet(EPBaseAPIViewSet):
     model = BlogPostPage
     base_serializer_class = BlogPostPageSerializer
     meta_fields = ['detail_url', 'slug','title', "owner","date_created"]
-    listing_default_fields = ["id",'slug',"title","detail_url", "thumbnail", "owner","date_created",'view_count','content','tags','is_pinned']
+    body_fields = ["description","thumbnail", "owner",'view_count','tags','is_pinned', 'content']
+    listing_default_fields = ["id",'slug',"title","detail_url", "description","thumbnail", "owner","date_created",'view_count','tags','is_pinned']
     lookup_field = "slug"
     lookup_url_kwarg = "slug"
 
