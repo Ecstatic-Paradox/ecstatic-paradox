@@ -174,6 +174,7 @@ class BlogPostPageSerializer(PageSerializer):
             "tags",
             "thumbnail",
             "is_pinned",
+            "description",
             "owner",
 
         ]
