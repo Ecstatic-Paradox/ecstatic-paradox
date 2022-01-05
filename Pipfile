@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 wagtail = "*"
 django-simple-captcha = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 
