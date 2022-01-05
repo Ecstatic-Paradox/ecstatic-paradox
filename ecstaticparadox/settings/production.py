@@ -4,8 +4,8 @@ import os
 
 SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = False
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
 ALLOWED_HOSTS = ['periergia.com']
 try:
     from .local import *
