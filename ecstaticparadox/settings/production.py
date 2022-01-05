@@ -6,7 +6,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = False
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
-ALLOWED_HOSTS = ['app.ecstaticparadox.com']
+ALLOWED_HOSTS = ['app.ecstaticparadox.com', 'ecstaticparadox.com']
 CORS_ORIGIN_WHITELIST = ('ecstaticparadox.com')
 try:
     from .local import *
