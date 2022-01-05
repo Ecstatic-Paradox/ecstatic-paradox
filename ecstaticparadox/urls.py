@@ -1,7 +1,8 @@
 from operator import imod
 from django.conf import settings
-from django.urls import include, path
+from django.urls import include, path 
 from django.contrib import admin
+from django.views.generic import RedirectView
 
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.core import urls as wagtail_urls
@@ -41,7 +42,9 @@ urlpatterns = urlpatterns + [
     ),  # For anything not caught by a more specific rule above, hand over to
     # Wagtail's page serving mechanism. This should be the last pattern in
     # the list:
-    path("", include(wagtail_urls)),
+    # path("", include(wagtail_urls)),
+    path("", RedirectView.as_view(url="/admin")),
+
     # Alternatively, if you want Wagtail pages to be served from a subpath
     # of your site, rather than the site root:
     #    path("pages/", include(wagtail_urls)),
