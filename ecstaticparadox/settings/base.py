@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'corsheaders'
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -160,12 +160,8 @@ STATIC_URL = "/static/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
-X_FRAME_OPTIONS = 'ALLOWALL'
-
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = (
-       'http://localhost:3000',
-)
+CORS_ORIGIN_WHITELIST = ("http://localhost:3000", "https://ecstaticparadox.com")
 
 # Wagtail settings
 
@@ -189,7 +185,6 @@ WAGTAIL_USER_CUSTOM_FIELDS = [
     "fb_profile_link",
     "bio",
     "designation",
-    "is_core_member"
+    "is_core_member",
 ]
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
-
