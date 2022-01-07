@@ -8,6 +8,7 @@ CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
 ALLOWED_HOSTS = ['app.ecstaticparadox.com', 'ecstaticparadox.com']
 CORS_ORIGIN_WHITELIST = ('ecstaticparadox.com')
+WAGTAILAPI_BASE_URL = "https://app.ecstaticparadox.com"
 try:
     from .local import *
 except ImportError:
