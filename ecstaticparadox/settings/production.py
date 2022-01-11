@@ -7,7 +7,7 @@ DEBUG = False
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
 ALLOWED_HOSTS = ['app.ecstaticparadox.com', 'ecstaticparadox.com']
-CORS_ORIGIN_WHITELIST = ("https://ecstaticparadox.com")
+CORS_ORIGIN_WHITELIST = ("https://ecstaticparadox.com",)
 WAGTAILAPI_BASE_URL = "https://app.ecstaticparadox.com"
 
 
