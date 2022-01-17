@@ -143,6 +143,7 @@ class CoreMemberSerializer(serializers.ModelSerializer):
             "linkedIn_profile",
             "personal_website",
             "avatar",
+            "priority_order",
             "is_core_member"
         ]
 

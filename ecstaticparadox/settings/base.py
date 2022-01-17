@@ -186,7 +186,8 @@ WAGTAIL_USER_CUSTOM_FIELDS = [
     "personal_website",
     "bio",
     "designation",
-    "is_core_member"
+    "is_core_member",
+    "priority_order"
 ]
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
