@@ -23,7 +23,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "fb_profile_link","avatar"]
+        fields = ["first_name", "last_name", "avatar"]
 
     def get_avatar(self, instance):
         if instance.wagtail_userprofile.avatar:
@@ -140,7 +140,8 @@ class CoreMemberSerializer(serializers.ModelSerializer):
             "gender",
             "designation",
             "user_department",
-            "fb_profile_link",
+            "linkedIn_profile",
+            "personal_website",
             "avatar",
             "is_core_member"
         ]
