@@ -71,6 +71,7 @@ class User(AbstractUser):
     )
     gender = models.BooleanField(null=True, blank=True,)
     is_core_member = models.BooleanField(default=True)
+    priority_order = models.PositiveIntegerField(default=1)
     # If any updates is made in the User fields then also update at settings.py "WAGTAIL_USER_CUSTOM_FIELDS"
     # and CustomProfileSettingsForm on form.py  and templates on wagtailusers\users\create.html & edit.html
     # In order make the fields editable through Wagtail settings.
