@@ -26,7 +26,8 @@ class CustomProfileSettingsForm(forms.ModelForm):
             "user_department",
             "institution",
             "bio",
-            "fb_profile_link",
+            "linkedIn_profile",
+            "personal_website",
             "designation",
             # "is_core_member"  #don't add it here, else users will be able to change themselves into core member
 
