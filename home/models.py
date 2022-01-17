@@ -61,7 +61,9 @@ class User(AbstractUser):
         "home.Department", on_delete=models.SET_NULL, null=True, blank=True
     )
     institution = models.CharField(max_length=1000, blank=True, null=True)
-    fb_profile_link = models.CharField(max_length=1000, blank=True, null=True)
+    # fb_profile_link = models.CharField(max_length=1000, blank=True, null=True)
+    linkedIn_profile = models.CharField(max_length=1000, blank=True, null=True) # Not added in templates
+    personal_website = models.CharField(max_length=1000, blank=True, null=True) # Not added in templates
     bio = models.TextField(blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     designation = models.CharField(
