@@ -248,7 +248,7 @@ class AboutAPIViewSet(BaseAPIViewSet):
         return Response(serializer.data)
 
     def members_list(self, req):
-        queryset = User.objects.filter(is_superuser=False)
+        queryset = User.objects.filter(is_superuser=False).order_by("priority_order")
         serializer = CoreMemberSerializer(
             queryset, many=True, context=self.get_serializer_context()
         )
