@@ -295,8 +295,8 @@ class Webinar(models.Model, index.Indexed):
         on_delete=models.SET_NULL,
         related_name="+",
     )
-    youtube_link = models.TextField()
-    registration_form = models.TextField()
+    youtube_link = models.TextField(null=True, blank=True)
+    registration_form = models.TextField(null=True, blank=True)
 
     panels = [
         FieldPanel("program_date"),
@@ -324,8 +324,8 @@ class Symposium(models.Model, index.Indexed):
         on_delete=models.SET_NULL,
         related_name="+",
     )
-    youtube_link = models.TextField()
-    registration_form = models.TextField()
+    youtube_link = models.TextField(null=True, blank=True)
+    registration_form = models.TextField(null=True, blank=True)
 
     panels = [
         FieldPanel("date"),
@@ -362,8 +362,8 @@ class Course(models.Model, index.Indexed):
         on_delete=models.SET_NULL,
         related_name="+",
     )
-    youtube_link = models.TextField()
-    registration_form = models.TextField()
+    youtube_link = models.TextField(null=True, blank=True)
+    registration_form = models.TextField(null=True, blank=True)
 
     panels = [
         FieldPanel("date"),
