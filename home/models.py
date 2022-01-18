@@ -60,7 +60,7 @@ class User(AbstractUser):
     # First Name, Last Name, Email, Username, Password From Abstract Class.
     # Access Profile picture through user.wagtail_userprofile.avatar (Provided in post_save )
     country = models.CharField(max_length=20)
-    address = models.CharField(max_length=20, blank=True, null=True)
+    address = models.CharField(max_length=256, blank=True, null=True)
     contact = models.CharField(max_length=20)
     user_department = models.ForeignKey(
         "home.Department", on_delete=models.SET_NULL, null=True, blank=True
