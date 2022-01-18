@@ -132,6 +132,7 @@ class CoreMemberSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='department_title'
     )
+    gender = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = [
@@ -152,6 +153,11 @@ class CoreMemberSerializer(serializers.ModelSerializer):
         if instance.wagtail_userprofile.avatar:
             return instance.wagtail_userprofile.avatar.url
         return None
+    
+    def get_gender(self, instance):
+        if instance.gender:
+            return "Male"
+        return "Female"
 
 
 class BlogPostPageSerializer(PageSerializer):
