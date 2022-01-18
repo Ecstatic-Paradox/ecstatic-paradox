@@ -50,12 +50,17 @@ class HomePage(Page):
 
 
 class User(AbstractUser):
+    
+    GENDER_CHOICES = [
+        (0, 'Female'),
+        (1, 'Male')
+    ]
     """Store General information about user and also handle auth."""
 
     # First Name, Last Name, Email, Username, Password From Abstract Class.
     # Access Profile picture through user.wagtail_userprofile.avatar (Provided in post_save )
     country = models.CharField(max_length=20)
-    address = models.CharField(max_length=20, blank=True, null=True)
+    address = models.CharField(max_length=256, blank=True, null=True)
     contact = models.CharField(max_length=20)
     user_department = models.ForeignKey(
         "home.Department", on_delete=models.SET_NULL, null=True, blank=True
@@ -69,7 +74,7 @@ class User(AbstractUser):
     designation = models.CharField(
         max_length=1000, default="Member", blank=True, null=True
     )
-    gender = models.BooleanField(null=True, blank=True,)
+    gender = models.BooleanField(null=True, blank=True, choices=GENDER_CHOICES)
     is_core_member = models.BooleanField(default=True)
     priority_order = models.PositiveIntegerField(default=1)
     # If any updates is made in the User fields then also update at settings.py "WAGTAIL_USER_CUSTOM_FIELDS"
