@@ -1,6 +1,10 @@
 from wagtail.core import hooks
 from django.utils.html import format_html
 from django.templatetags.static import static
+from .custom_urls import *
+from .edit_menu import *
+from .homepage_panels import *
+from .modeladmins import *
 
 @hooks.register("insert_global_admin_css")
 def global_admin_css():
