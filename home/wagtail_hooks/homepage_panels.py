@@ -25,7 +25,7 @@ class NotificationPanel:
         #     .order_by("-date_added")
         # )
 
-        if unexpired.count() == 0 and expired.count() == 0:
+        if unexpired.count() == 0 :
             return render_to_string(
                 "home/home_notifications.html",
                 {"notifications": False},
