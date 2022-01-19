@@ -1,5 +1,5 @@
 from wagtail.core import hooks
-from .models import (
+from home.models import (
     Attendance,
     Absentee,
     BlogPostPage,
@@ -16,6 +16,7 @@ from .models import (
     Notification,
     Gallery
 )
+from home.views import AttendanceIssueInspect
 
 from wagtail.contrib.modeladmin.options import (
     ModelAdmin,
