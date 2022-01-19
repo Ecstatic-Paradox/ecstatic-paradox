@@ -1,9 +1,10 @@
-{% load i18n wagtailadmin_tags %} {% if page_revisions_for_moderation %}
+{% load i18n wagtailadmin_tags %} 
 <section class="ep_panel_wrapper">
   <div class="ep_panel_title_wrapper">
     {% trans "Pages awaiting moderation" %}
   </div>
   <section class="ep_panel_content">
+    {% if page_revisions_for_moderation %}
     {% for revision in page_revisions_for_moderation %} {% page_permission
     revision.page as page_perms %}
 {% comment %} 
@@ -92,7 +93,11 @@
     </div>
 
     {% endfor %}
+    {% else %}
+    <div class="ep_null">
+      <span style="font-weight: 600"> Hey Yo! C'mon Write Sth 😑 </span>
+    </div>
+    {% endif %}
   </section>
 </section>
 
-{% endif %}

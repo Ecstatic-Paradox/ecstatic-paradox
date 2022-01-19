@@ -1,8 +1,9 @@
-{% load i18n wagtailadmin_tags %} {% if last_edits %}
+{% load i18n wagtailadmin_tags %}
 <section class="ep_panel_wrapper">
   <div class="ep_panel_title_wrapper">{% trans "Your Recent Edits" %}</div>
-
+  
   <section class="ep_panel_content">
+    {% if last_edits %}
     {% for revision, page in last_edits %}
     <div class="ep_panel_recent_edit">
       <div class="ep_recent_edit_thumbnail">
@@ -68,6 +69,10 @@
       </div>
     </div>
     {% endfor %}
+    {% else %}
+    <div class="ep_null">
+      <span style="font-weight: 600"> Wow, such a clean profile 😪 </span>
+    </div>
+    {% endif %}
   </section>
 </section>
-{% endif %}

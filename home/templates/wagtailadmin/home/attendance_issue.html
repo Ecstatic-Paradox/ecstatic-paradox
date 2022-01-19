@@ -1,15 +1,19 @@
 {% load i18n wagtailadmin_tags %} 
-{% if is_unattended %}
 <section class="ep_panel_wrapper">
     <div class="ep_panel_title_wrapper">
         {% trans "Attendance" %}
     </div>
     <section class="ep_attendance_container">
+    {% if is_unattended %}
         <div> Now Opened </div>
         <a href="/admin/fill-attendance">
             Take Attendance
-        </a>      
+        </a>   
+    {% else %}
+        <div>Now Closed!</div>
+        <span>HR is watching you 😈 </span>
+    {% endif %}
 
     </section>
-{% endif %}
+    </section>
   

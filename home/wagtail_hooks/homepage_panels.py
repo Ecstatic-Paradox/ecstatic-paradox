@@ -8,7 +8,7 @@ import datetime
 # Add notifications Section in Dashboard Home
 class NotificationPanel:
 
-    order = 50
+    order = 52
 
     def __init__(self, request):
         self.request = request
@@ -27,7 +27,7 @@ class NotificationPanel:
 
         if unexpired.count() == 0 :
             return render_to_string(
-                "home/home_notifications.html",
+            "wagtailadmin/home/dashboard_notice.html",
                 {"notifications": False},
                 request=self.request,
             )
@@ -43,7 +43,7 @@ class NotificationPanel:
 
 
 class AttendanceButtonPanel:
-    order = 49
+    order = 51
 
     def __init__(self, request):
         self.request = request
@@ -69,7 +69,7 @@ class AttendanceButtonPanel:
 
 
 class AbsentDatesPanel:
-    order = 51
+    order = 53
 
     def __init__(self, request):
         self.request = request
