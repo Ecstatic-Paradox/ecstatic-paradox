@@ -1,3 +1,4 @@
+ @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,800&display=swap');
 .ep_absentee_form_container,
 .ep_members_list_container {
   margin-left: 30px;
@@ -59,4 +60,186 @@ ul.ep_absent_record {
 }
 ul.ep_absent_record > li {
   margin-top: 20px;
+}
+/*Change Font Everywhere*/
+body {
+  font-family: Poppins, Arial, Helvetica, sans-serif;
+}
+
+.content{
+  background: #f2f2f2; /* Changes bg color */
+}
+/**/
+header h1{
+  font-weight: 800;
+}
+/* Dash Board Panels CSS */
+.ep_panel_wrapper{
+  margin: 20px 10px 20px 10px ;
+
+}
+.ep_panel_title_wrapper{
+  font-weight: 700;
+  font-size: 18px;
+  border-left: var(--color-primary-darker) solid 6px;
+  color: black;
+  padding: 10px;
+}
+.ep_panel_recent_edit {
+  list-style: none;
+  display: flex;
+  flex-flow: row;
+  background: white;
+  margin-top: 10px;
+  border-radius: 5px;
+  position: relative;
+  border: 1px solid #0000002b;  
+  justify-content: space-between;
+}
+.ep_panel_recent_edit ul{
+  list-style: none;
+}
+.ep_panel_recent_edit > *{
+  margin: 20px 10px 30px 10px;
+}
+.ep_recent_edit_thumbnail {
+  max-width: 50%;  
+  width: 300px;
+  height: max-content;
+}
+.ep_recent_edit_thumbnail img{
+  border-radius: 5px;
+  object-fit: cover;
+  position: relative;
+}
+.ep_recent_edit_title{
+  font-weight: 600;
+}
+.ep_recent_edit_title ul{
+  padding: 0;
+}
+
+.ep_panel_item{
+  list-style: none;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  background: white;
+  margin-top: 10px;
+  border-radius: 5px;
+  position: relative;
+  border: 1px solid #0000002b;  
+  justify-content: space-between;
+  width: 700px;
+  max-width: 90%;  
+}
+.ep_panel_item > * {
+  margin: 20px 10px 20px 10px;
+}
+.ep_mod_title{
+  font-weight: 600;
+}
+
+.ep_mod_buttons .actions {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 40%;
+}
+.ep_mod_buttons .actions > *{
+  margin: 5px 5px 0 0;
+}
+.ep_panel_review{
+  max-width: 100%;
+  width: 100%;
+  align-items: center;
+}
+.ep_notice_container{
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  max-width: 50vw;
+  width: 600px;
+}
+
+.ep_notice{
+  margin: 0 2px 0 2px;
+  display: flex;
+  flex-flow: column;
+  background: white;
+  margin-top: 10px;
+  border-radius: 5px;
+  position: relative;
+  border: 1px solid #0000002b;  
+  justify-content: space-around;
+  width: max-content;
+  max-width: 300px;
+  min-height: 100px;
+}
+.ep_notice > * {
+  margin: 5px 5px 5px 5px;
+}
+
+.ep_attendance_container{
+  width: 300px;
+  max-width: 90vw;
+  height: 150px;
+  display: flex;
+  border-radius: 3px;
+  flex-flow: column;
+  justify-content: space-around;
+  align-items: center;
+  background: white;
+  margin-top: 10px;
+  border: 1px solid #0000002b; 
+}
+.ep_attendance_container span{
+  color: var(--color-primary);
+}
+.ep_attendance_container a{
+  text-decoration: none;
+  display: inline-block;
+  width: 200px;
+  text-align: center;
+  padding: 20px 5px 20px 5px;
+  color:white;
+  background: var(--color-primary-darker);
+  font-weight: 600;
+  
+}
+
+.ep_record_container{
+  max-width: 200px;
+  display: flex;
+  flex-flow: column nowrap;
+  margin-top: 10px;
+  
+}
+.ep_record{
+  background: white;
+  border-radius: 3px;
+  font-weight: 600;
+  padding: 5px 5px 5px 5px;
+  margin-top: 5px;
+  text-align: center;
+  border: 1px solid #0000002b; 
+}
+
+
+@media screen and (max-width:500px){
+  .ep_panel_recent_edit{
+    flex-flow: column;
+  }
+  .ep_recent_edit_thumbnail{
+    width: calc(100% - 20px);
+    max-width: 100%;
+  }
+  .ep_panel_recent_edit > *{
+    margin: 10px 5px 0px 10px;
+  }
+
+  .ep_notice_container{
+    max-width: 100%;
+    width:100%;
+  }
 }

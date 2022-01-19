@@ -1,0 +1,18 @@
+{% load i18n wagtailadmin_tags %} 
+<section class="ep_panel_wrapper">
+  <div class="ep_panel_title_wrapper">
+    {% trans "Absent dates" %}
+  </div>
+  {% if has_records %}
+  <section class="ep_record_container">
+  {% for record in records %}
+        <div class="ep_record">
+          <span style="font-weight: 600"> {{record.issue_date.date}} </span>
+        </div> 
+        {% endfor %}
+    </section>
+    {% else %}
+    
+    <span style="font-weight: 600"> Not Absent yet </span>
+{% endif %}
+</section>

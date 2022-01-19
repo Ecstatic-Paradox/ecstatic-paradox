@@ -1,0 +1,42 @@
+{% load i18n wagtailadmin_tags %} {% if workflow_states %}
+<section class="ep_panel_wrapper">
+  <div class="ep_panel_title_wrapper">
+    {% trans "Your pages in a workflow" %}
+  </div>
+  <section class="ep_panel_content">
+    {% for workflow_state in workflow_states %} 
+    {% with workflow_state.current_task_state.page_revision as revision %}
+    {%page_permissions workflow_state.page as page_perms %}
+    <div class="ep_panel_item">
+    <div class="ep_mod_title">
+      {% if page_perms.can_edit %}
+      <a
+        href="{% url 'wagtailadmin_pages:edit' workflow_state.page.id %}"
+        title="{% trans 'Edit this page' %}"
+        >{{ workflow_state.page.specific_deferred.get_admin_display_title }}</a
+      >
+      {% else %} {{
+      workflow_state.page.specific_deferred.get_admin_display_title }} 
+      {% endif %}
+      {% include "wagtailadmin/pages/listing/_privacy_indicator.html" with page=workflow_state.page %} 
+      {% include "wagtailadmin/pages/listing/_locked_indicator.html" with page=workflow_state.page %}
+      </div>
+      <div class="ep_mod_status">
+        {% if workflow_state.current_task_state.status == 'rejected' %} 
+        {% icon name="warning" class_name="default" %} {% trans "Changes requested at" %} 
+        {% elif workflow_state.current_task_state.status == 'in_progress' %}
+        {% trans "Awaiting" %} 
+        {% endif %} 
+        {{ workflow_state.current_task_state.task.name }}
+      </div>
+
+      <div class="ep_mod_date">
+            <div class="human-readable-date" title="{{ workflow_state.current_task_state.started_at|date:"DATETIME_FORMAT" }}">{% blocktrans with time_period=workflow_state.current_task_state.started_at|timesince_simple %}{{ time_period }}{% endblocktrans %} </div>
+      </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+  </section>
+</section>
+
+{% endif %}

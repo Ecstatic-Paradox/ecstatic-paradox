@@ -1,4 +1,26 @@
 {% extends "wagtailadmin/home.html" %}
 {% load wagtailadmin_tags i18n %}
-{% block branding_welcome %}Ecstatic Paradox's Dashboard{% endblock %}
     
+{% block content %}
+    <header class="merged nice-padding">
+        <div class="row">
+            <div class="col1">
+                <div class="avatar"><img src="{% avatar_url user %}" alt="" /></div>
+            </div>
+            <div class="col9">
+                <h1>Ecstatic Paradox's Dashboard</h1>
+                <div class="user-name">{{ user|user_display_name }}</div>
+            </div>
+        </div>
+    </header>
+    <section style="display: flex; flex-direction:row; flex-wrap: wrap;">
+
+        {% if panels %}
+        {% for panel in panels %}
+        {% component panel fallback_render_method=True %}
+        {% endfor %}
+        {% else %}
+        <p>{% trans "This is your dashboard on which helpful information about content you've created will be displayed." %}</p>
+        {% endif %}
+    </section>
+{% endblock content %}

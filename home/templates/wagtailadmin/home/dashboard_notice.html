@@ -1,0 +1,21 @@
+{% load i18n wagtailadmin_tags %} 
+<section class="ep_panel_wrapper">
+  <div class="ep_panel_title_wrapper">
+    {% trans "Notices" %}
+  </div>
+{% if notifications %}
+<section class="ep_notice_container">
+  {% for notice in notices %}
+        <div class="ep_notice">
+          <span style="font-weight: 600"> {{notice.title}} </span>
+            <span> {{ notice.message }}</span>
+            {% if notice.is_pinned %}
+                <span style="font-size:12px; font-style:italic;">Pinned</span>
+                {% endif %}
+        </div> 
+        {% endfor %}
+      </section>
+{% else %}
+ <span style="font-weight:600">No Active Notices.</span>
+{% endif %}
+</section>
