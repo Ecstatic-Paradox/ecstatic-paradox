@@ -1,0 +1,98 @@
+{% load i18n wagtailadmin_tags %} {% if page_revisions_for_moderation %}
+<section class="ep_panel_wrapper">
+  <div class="ep_panel_title_wrapper">
+    {% trans "Pages awaiting moderation" %}
+  </div>
+  <section class="ep_panel_content">
+    {% for revision in page_revisions_for_moderation %} {% page_permission
+    revision.page as page_perms %}
+{% comment %} 
+    <div class="ep_mod_thumbnail">
+        {% if revision.page.thumbnail %}
+        <img src="{{ revision.page.thumbnail.file.url }}" alt="{{ revision.page.thumbnail.default_alt_text }}">
+        {% endif %}
+    </div> {% endcomment %}
+
+    <div class="ep_mod_title">
+      {% if page_perms.can_edit %}
+      <a
+        href="{% url 'wagtailadmin_pages:edit' revision.page.id %}"
+        title="{% trans 'Edit this page' %}"
+        >{{ revision.page.specific_deferred.get_admin_display_title }}</a
+      >
+      {% elif revision.page.is_previewable %}
+      <a
+        href="{% url 'wagtailadmin_pages:preview_for_moderation' revision.id %}"
+        title="{% trans 'Preview this page' %}"
+        >{{ revision.page.specific_deferred.get_admin_display_title }}</a
+      >
+      {% else %} {{ revision.page.specific_deferred.get_admin_display_title }}
+      {% endif %} {% include
+      "wagtailadmin/pages/listing/_privacy_indicator.html" with
+      page=revision.page %} {% include
+      "wagtailadmin/pages/listing/_locked_indicator.html" with
+      page=revision.page %}
+
+      <ul class="actions">
+        <li>
+          <form
+            action="{% url 'wagtailadmin_pages:approve_moderation' revision.id %}"
+            method="POST"
+          >
+            {% csrf_token %}
+            <input
+              type="submit"
+              class="button button-small button-secondary"
+              value="{% trans 'Approve' %}"
+            />
+          </form>
+        </li>
+        <li class="no-border">
+          <form
+            action="{% url 'wagtailadmin_pages:reject_moderation' revision.id %}"
+            method="POST"
+          >
+            {% csrf_token %}
+            <input
+              type="submit"
+              class="button button-small button-secondary no"
+              value="{% trans 'Reject' %}"
+            />
+          </form>
+        </li>
+        {% if page_perms.can_edit %}
+        <li>
+          <a
+            href="{% url 'wagtailadmin_pages:edit' revision.page.id %}"
+            class="button button-small button-secondary"
+            >{% trans 'Edit' %}</a
+          >
+        </li>
+        {% endif %} {% if revision.page.is_previewable %}
+        <li>
+          <a
+            href="{% url 'wagtailadmin_pages:preview_for_moderation' revision.id %}"
+            class="button button-small button-secondary"
+            target="_blank"
+            rel="noopener noreferrer"
+            >{% trans 'Preview' %}</a
+          >
+        </li>
+        {% endif %}
+      </ul>
+
+       <a href="{% url 'wagtailadmin_explore' revision.page.get_parent.id %}">{{ revision.page.get_parent.specific_deferred.get_admin_display_title }}</a>
+        {{ revision.page.content_type.model_class.get_verbose_name }}
+          
+         <div class="human-readable-date" title="{{ revision.created_at|date:"DATETIME_FORMAT" }}">
+             {% blocktrans with time_period=revision.created_at|timesince_simple %}{{ time_period }}{% endblocktrans %} </div>
+                            {% if revision.user %}
+                                by {{ revision.user|user_display_name }}
+                            {% endif %}
+    </div>
+
+    {% endfor %}
+  </section>
+</section>
+
+{% endif %}
