@@ -143,8 +143,9 @@ def main_menu_edit(request, menu_items):
             title="mainpage", slug="mainapp", depth=2, path="00010002"
         )
         HomePage.save(mainpage)
-    menu_items[:] = [i for i in menu_items if (i.label not in ["Pages"])]
 
+    if not request.user.is_superuser:
+        menu_items[:] = [i for i in menu_items if (i.label not in ["Pages", "Images", "Documents", "Reports"])]
     return HttpResponseRedirect("/fill-attendance")
 
 
