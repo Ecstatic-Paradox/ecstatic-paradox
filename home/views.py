@@ -217,6 +217,10 @@ class MembersListView(ListView):
     context_object_name = "members"
     model = User
 
+    def get_queryset(self):
+        return User.objects.filter(is_superuser=False)
+    
+
 
 class MemberInspectView(DetailView):
 

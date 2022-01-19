@@ -39,28 +39,6 @@
   object-fit: cover;
 }
 
-.ep_profile_container > ul {
-  list-style: none;
-}
-
-.ep_profile_container > ul > li {
-  margin: 20px;
-  font-size: 20px;
-}
-
-.ep_profile_container .ep_thumbnail_img > img {
-  width: 300px;
-  height: 300px;
-  object-fit: cover;
-  border: 1px solid var(--color-primary-darker);
-  border-radius: 300px;
-}
-ul.ep_absent_record {
-  margin-top: 70px;
-}
-ul.ep_absent_record > li {
-  margin-top: 20px;
-}
 /*Change Font Everywhere*/
 body {
   font-family: Poppins, Arial, Helvetica, sans-serif;
@@ -75,7 +53,11 @@ header h1{
 }
 /* Dash Board Panels CSS */
 .ep_panel_wrapper{
-  margin: 20px 10px 20px 10px ;
+  margin: 20px 10px 20px 40px ;
+  /* width: 100%;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap; */
 
 }
 .ep_panel_title_wrapper{
@@ -225,7 +207,17 @@ header h1{
   border: 1px solid #0000002b; 
 }
 
-
+.ep_null{
+  width: 300px;
+  border: 1px solid #0000002b; 
+  background: white;
+  border-radius: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  min-height: 100px;
+}
 @media screen and (max-width:500px){
   .ep_panel_recent_edit{
     flex-flow: column;
@@ -237,9 +229,66 @@ header h1{
   .ep_panel_recent_edit > *{
     margin: 10px 5px 0px 10px;
   }
-
+  
   .ep_notice_container{
     max-width: 100%;
     width:100%;
   }
+}
+
+
+
+/* User Profiles ------------------------------------------------------------------------------------- */
+
+
+.ep_profile_wrapper{
+  width: 100%;
+  background: #f2f2f2; 
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  padding-right: 20px;
+  /* align-items: center; */
+}
+.ep_profile_wrapper > *{
+  margin: 10px 0 10px 0;
+}
+.ep_profile_container{
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+}
+.ep_pf_thumbnail img{
+  border-radius: 100%;
+  width: 200px;
+  height: 200px;
+  transform: translateY(30px);
+}
+.ep_pf_info{
+  background: white;
+  display: flex;
+  border-radius: 5px;
+  border: 1px solid #0000002b; 
+  flex-flow: column;
+  width: 500px;
+  max-width: 90%;
+  padding-top: 30px;
+  font-size: 15px;
+  padding-bottom: 20px;
+}
+.ep_pf_info_name{
+  text-align: center;
+  font-size: 18px;
+}
+.ep_pf_info > * {
+  margin: 5px 10px 5px 10px;
+}
+.ep_pf_info_bio{
+  margin-top: 20px;
+  text-align: center;
+  min-height: 50px;
+}
+
+.ep_pf_recent_publications{
+  margin-top:10px;
 }
