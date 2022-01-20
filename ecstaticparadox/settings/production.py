@@ -7,7 +7,7 @@ DEBUG = False
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 ALLOWED_HOSTS = ['app.ecstaticparadox.com', 'ecstaticparadox.com']
-CORS_ORIGIN_WHITELIST = ("https://ecstaticparadox.com",)
+CORS_ORIGIN_WHITELIST = ("https://ecstaticparadox.com", "https://www.ecstaticparadox.com")
 WAGTAILAPI_BASE_URL = "https://app.ecstaticparadox.com"
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
