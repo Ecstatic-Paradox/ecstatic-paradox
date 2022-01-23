@@ -1,11 +1,11 @@
 :root {
-  --color-primary: #0060c7;
-  --color-primary-darker: #164676;
-  --color-primary-dark: #282828;
-  --color-primary-lighter: #ffffff;
-  --color-primary-light: #318cf5;
+  --color-primary: #0060c7 !important;
+  --color-primary-darker: #164676 !important;
+  --color-primary-dark: #282828 !important;
+  --color-primary-lighter: #ffffff !important;
+  --color-primary-light: #318cf5 !important;
   /* --color-input-focus: rgb(204, 0, 102); */
-  --color-input-focus-border: #0060c7;
+  --color-input-focus-border: #0060c7 !important;
 }
 
 /* It was about colors but soory */
