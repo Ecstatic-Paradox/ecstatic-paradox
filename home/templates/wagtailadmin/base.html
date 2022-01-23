@@ -2,5 +2,7 @@
 {% load static %}
 
 {% block branding_logo %}
-<img src="{% static 'images/logo.png' %}" alt="Custom Project" width="80" />
-{% endblock %}
+{% comment %} <div style="display:flex; flex-flow:column; align-items:center; margin-bottom:10px;"> {% endcomment %}
+    <img src="{% static 'images/logo.png' %}" alt="Custom Project" width="80" />
+    {% comment %} <a href="/admin" style="text-decoration:none; font-weight: 600;color:white;"> Dashboard</a> {% endcomment %}
+    {% endblock %}

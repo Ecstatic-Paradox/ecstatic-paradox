@@ -3,6 +3,7 @@
   <div class="ep_panel_title_wrapper">
     {% trans "Notices" %}
   </div>
+  
 {% if notifications %}
 <section class="ep_notice_container">
   {% for notice in notices %}
@@ -16,6 +17,8 @@
         {% endfor %}
       </section>
 {% else %}
- <span style="font-weight:600">No Active Notices.</span>
+    <div class="ep_null">
+      <span style="font-weight: 600"> Finally, inner peace 😭 </span>
+    </div>
 {% endif %}
 </section>

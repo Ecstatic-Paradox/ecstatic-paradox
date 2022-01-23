@@ -12,11 +12,11 @@
 {% for i in members %} 
 <a href="/admin/members/{{ i.id }}">
 <div class="ep_members_list_item">
-    <div class="ep_item_photo">
+    <div class="ep_mem_photo">
             <img src="{% avatar_url i 100 %}" alt="Photo: {{ i.get_full_name }}">
     </div>
-    <div class="ep_item_name">{{ i.get_full_name }}</div>
-    <div class="ep_item_text "> {{ i.designation  }}, {{ i.user_department }}</div>
+    <div class="ep_mem_name">{{ i.get_full_name }}</div>
+    <div class="ep_mem_text "> {{ i.designation  }}, {{ i.user_department }}</div>
 
 
 </div>

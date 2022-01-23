@@ -3,30 +3,89 @@
 {% block titletag %} {{ view.page_title }} {% endblock %}
 
 {% block content %}
-<div class="ep_profile_container">
-    <ul>
-        <li class="ep_thumbnail_img"> <img src="{% avatar_url member 100 %} " alt="Photo: {{ member.get_full_name }}"></li>
-        <li class="ep_profile_text ep_profile_name"><strong>{{ member.get_full_name }}</strong></li>
-        <li class="ep_profile_text">Contact: {{ member.contact }} </li>
-        <li class="ep_profile_text">Address: {{ member.address }}</li>
-        <li class="ep_profile_text">Institution: {{ member.institution }}</li>
-        <li class="ep_profile_text">Country: {{ member.country }}</li>
-    </ul>
-    <ul class="ep_absent_record">
-    <li><strong> Absent Record </strong></li>
-    {% if member.get_absent_record %}
-        {% for record in member.get_absent_record %}
-
-        {% if record.remarks %}
-            <li><b>Date: </b> {{ record.issue_date.date }},<b> Reason: </b> {{ record.remarks }}  </li>
+<div class="ep_profile_wrapper">
+    <div class="ep_profile_container">
+        <div class="ep_pf_thumbnail">
+            <img src="{% avatar_url member 100 %} " alt="Photo: {{ member.get_full_name }}">
+        </div>
+        <div class="ep_pf_info">
+            <div class="ep_pf_info_name"> <strong>{{ member.get_full_name }}</strong> </div>
+            <div class="ep_pf_info_bio" >{{ member.bio }}</div>
+            <div> <strong> Designation : </strong> {{ member.designation }}</div>
+            <div> <strong> Department : </strong> {{ member.user_department.department_title }}</div>
+            <div> <strong> Address : </strong> {{ member.address }}</div>
+            <div> <strong> Contact : </strong> {{ member.contact }}</div>
+            <div> <strong> Linked In : </strong> {{ member.linkedIn_profile }}</div>
+            <div> <strong> Personal Website : </strong> {{ member.personal_website }}</div>
+        </div>
+    </div>
+    <div>
+    <div class="ep_pf_absent_wrapper">
+          <div class="ep_panel_title_wrapper">
+            {% trans "Absent dates" %}
+            </div>
+        {% if member.get_absent_record  %}
+            <section class="ep_record_container">
+                {% for record in member.get_absent_record %}
+                    <div class="ep_record">
+                        <span style="font-weight: 600"> {{record.issue_date.date}} </span>
+                        <p>
+                        {% if record.remarks %}
+                        <span> <strong> Reason : </strong> {{ record.remarks }}</span>
+                        {% else %}
+                        <span> <strong> Reason : </strong><i> Not Provided yet </i> </span>
+                        {% endif %}
+                        </p>
+                    </div> 
+                {% endfor %}
+            </section>
         {% else %}
-            <li>Date: {{ record.issue_date.date }}, Reason: Not Given Yet  </li>
-
+        <div class="ep_null">
+            <span style="font-weight: 600"> Damn, Full Attendence 🔥 </span>
+        </div>
         {% endif %}
-        {% endfor %}
+    </div>
+    <div class="ep_pf_recent_publications">
+        <div class="ep_panel_title_wrapper">
+    {{ member.first_name }}{% trans "'s Recent Publications " %}
+  </div>
+  {% if member.owned_pages.public.count %}
+  {% for page in member.owned_pages.public %}
+  <div class="ep_panel_recent_edit">
+      <div class="ep_recent_edit_thumbnail">
+          {% if page.blogpostpage.thumbnail %}
+          <img
+          src="{{ page.blogpostpage.thumbnail.file.url }}"
+          alt="{{ page.blogpostpage.thumbnail.default_alt_text }}"
+          />
+          {% endif %}
+          {% if page.article.thumbnail %}
+          <img
+          src="{{ page.article.thumbnail.file.url }}"
+          alt="{{ page.article.thumbnail.default_alt_text }}"
+          />
+          {% endif %}
+        </div>
+        <div class="ep_recent_edit_title">
+            {% comment %} <a
+            href="{% url 'wagtailadmin_pages' page.id %}"
+            title="{% trans 'page.get_admin_display_title' %}"
+            >{{ page.get_admin_display_title }}</a
+            > {% endcomment %}
+            <strong>{{ page.get_admin_display_title }}</strong>
+            
+            
+        </div>
+        
+    </div>
+    {% endfor %}
     {% else %}
-        <p>No Record Found.</p>
+     <div class="ep_null">
+            <span style="font-weight: 600"> Cool Content is on it's way 😎 </span>
+        </div>
     {% endif %}
-    </ul>
 </div>
+</div>
+</div>
+
 {% endblock content %}

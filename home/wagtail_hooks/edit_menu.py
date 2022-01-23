@@ -32,6 +32,16 @@ def register_ask_for_leave_menuitem():
     )
 
 @hooks.register("register_admin_menu_item")
+def register_dashboard_menuitem():
+
+    return MenuItem(
+        "Dashboard",
+        "/admin?",
+        classnames="icon",
+        order=1,
+    )
+
+@hooks.register("register_admin_menu_item")
 def register_members_list_menuitem():
 
     return MenuItem(
