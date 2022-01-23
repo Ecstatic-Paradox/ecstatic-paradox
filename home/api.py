@@ -22,6 +22,7 @@ from .models import (
     Symposium,
     Course,
     ResearchPaper,
+    ResearchPaperSection,
     Project,
     ProjectSection,
 )
@@ -33,6 +34,8 @@ from .serializers import (
     ProjectListSerializer,
     ProjectSectionSerializer,
     ResearchPaperSerializer,
+    ResearchPaperListSerializer,
+    ResearchPaperSectionSerializer,
 )
 
 api_router = WagtailAPIRouter("wagtailapi")
@@ -161,8 +164,22 @@ class ResearchPaperAPIViewSet(EPBaseAPIViewSet):
     model = ResearchPaper
     base_serializer_class = ResearchPaperSerializer
 
+    def listing_view(self, request):
+        response = super().listing_view(request)
+        sections_queryset = ResearchPaperSection.objects.all()
+        sections_serializer = ResearchPaperSectionSerializer(
+            sections_queryset, many=True, context=self.get_serializer_context()
+        )
+        response.data["meta"]["sections"] = sections_serializer.data
+        # try:
+        #     response.data["description"] = Truncator(response.data["description"]).words(2)
+        # except Exception:
+        #     pass
+
+        return response
+
     def get_queryset(self):
-        return self.model.objects.all().order_by("-id")
+        return self.model.objects.order_by("-id", "is_highlight")
 
     def detail_view(self, request, pk=None, slug=None):
         if slug:
@@ -170,6 +187,41 @@ class ResearchPaperAPIViewSet(EPBaseAPIViewSet):
         self.model.objects.filter(id=pk).update(view=F('view')+1)
         return super().detail_view(request, pk=pk, slug=slug)
     
+class ResearchPaperSectionAPIViewSet(EPBaseAPIViewSet):
+    model = ResearchPaperSection
+    base_serializer_class = ResearchPaperSectionSerializer
+    serializer_class = ResearchPaperSectionSerializer
+    body_fields = ["slug", "detail_url"]
+    meta_fields = ["detail_url", "name"]
+    listing_default_fields = ["id", "name", "slug"]
+    lookup_field = "slug"
+    lookup_url_kwarg = "slug"
+
+    def detail_view(self, request, pk=None, slug=None):
+        param = slug
+
+        if pk is not None:
+            self.lookup_field = "pk"
+            param = pk
+
+        res = super().detail_view(request, param)
+        if pk:
+            instance = self.model.objects.get(pk=pk)
+        elif slug:
+            instance = self.model.objects.get(slug=slug)
+
+        researchpapers_queryset = instance.researchpaper_set.order_by("-id", "is_highlight")
+        researchpapers_serializer = ResearchPaperListSerializer(
+            researchpapers_queryset, many=True, context=self.get_serializer_context()
+        )
+
+        res.data["items"] = researchpapers_serializer.data
+
+        return res
+
+    def get_queryset(self):
+        return self.model.objects.all()
+
 
 class ProjectAPIViewSet(EPBaseAPIViewSet):
     model = Project
@@ -328,6 +380,7 @@ api_router.register_endpoint("webinars", WebinarAPIViewSet)
 api_router.register_endpoint("symposiums", SymposiumAPIViewSet)
 api_router.register_endpoint("courses", CourseAPIViewSet)
 api_router.register_endpoint("researchpapers", ResearchPaperAPIViewSet)
+api_router.register_endpoint("researchpapers/sections", ResearchPaperSectionAPIViewSet)
 api_router.register_endpoint("projects", ProjectAPIViewSet)
 api_router.register_endpoint("projects/sections", ProjectSectionAPIViewSet)
 api_router.register_endpoint("about", AboutAPIViewSet)
