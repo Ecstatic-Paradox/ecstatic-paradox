@@ -697,7 +697,8 @@ class ProjectSection(CustomSection):
     class Meta:
         verbose_name = "Project Section"
         verbose_name_plural = "Project Sections"
-    
+
+@register_snippet
 class ResearchPaperSection(CustomSection):
 
     def __str__(self):

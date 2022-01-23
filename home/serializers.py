@@ -138,11 +138,11 @@ class ResearchPaperSectionSerializer(BaseSerializer):
     #     lookup_field = 'slug', view_name='projectsectionapiviewset', read_only=True
     # )
     meta_fields = []
-    research_paper_set = ResearchPaperListSerializer(many=True)
+    researchpaper_set = ResearchPaperListSerializer(many=True)
 
     class Meta:
         model = ResearchPaperSection
-        fields = ["id", "name", "slug", "detail_url", "research_paper_set"]
+        fields = ["id", "name", "slug", "detail_url", "researchpaper_set"]
 
 
 class CollaboratorsSerializer(serializers.ModelSerializer):
