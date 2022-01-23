@@ -9,6 +9,7 @@ from .models import (
     Project,
     ProjectSection,
     ResearchPaper,
+    ResearchPaperSection,
     User,
     Collaborators,
 )
@@ -112,6 +113,36 @@ class ResearchPaperSerializer(BaseSerializer):
             return ret
         return None
 
+class ResearchPaperListSerializer(BaseSerializer):
+    sections = serializers.StringRelatedField(many=True)
+    detail_url = DetailUrlField(read_only=True)
+    title = serializers.CharField()
+    thumbnail = CustomThumbnailSerializer()
+    author = AuthorSerializer(many=True, read_only=True)
+    # thumbnail = ImageRenditionField(filter_spec=['url', 'alt'])
+    description = serializers.SerializerMethodField()
+    # members = AuthorSerializer(many=True, read_only=True)
+    meta_fields = []
+    child_serializer_classes = {}  # added just to make it work, idk why it works
+    
+    class Meta:
+        model = ResearchPaper
+        fields = ["title","author", "detail_url", "slug", "sections", "thumbnail", "description","is_highlight"]
+
+    def get_description(self, instance):
+        return Truncator(instance.description).chars(40)
+
+class ResearchPaperSectionSerializer(BaseSerializer):
+    # detail_url = DetailUrlField(read_only=True)
+    # detail_url = serializers.HyperlinkedRelatedField(
+    #     lookup_field = 'slug', view_name='projectsectionapiviewset', read_only=True
+    # )
+    meta_fields = []
+    research_paper_set = ResearchPaperListSerializer(many=True)
+
+    class Meta:
+        model = ResearchPaperSection
+        fields = ["id", "name", "slug", "detail_url", "research_paper_set"]
 
 
 class CollaboratorsSerializer(serializers.ModelSerializer):

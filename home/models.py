@@ -398,6 +398,7 @@ class ResearchPaper(models.Model, index.Indexed):
     author = models.ManyToManyField(User)
     date_published = models.DateField()
     is_highlight = models.BooleanField(default=False)
+    sections = models.ManyToManyField("home.ResearchPaperSection", blank=True, null=True)
     # is_completed = models.BooleanField()
     thumbnail = models.ForeignKey(
         "wagtailimages.Image",
@@ -432,6 +433,7 @@ class ResearchPaper(models.Model, index.Indexed):
         ImageChooserPanel("thumbnail"),
         StreamFieldPanel("content", classname="full"),
         StreamFieldPanel("refrences", classname="full"),
+        FieldPanel("sections", widget=forms.CheckboxSelectMultiple),
         FieldPanel("slug"),
     ]
 
@@ -695,6 +697,14 @@ class ProjectSection(CustomSection):
     class Meta:
         verbose_name = "Project Section"
         verbose_name_plural = "Project Sections"
+    
+class ResearchPaperSection(CustomSection):
+
+    def __str__(self):
+        return self.name
+    class Meta:
+        verbose_name = "Research Paper Section"
+        verbose_name_plural = "Research Paper Sections"
     
 
 
