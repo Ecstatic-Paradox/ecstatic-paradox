@@ -333,18 +333,18 @@ class BlogAPIViewSet(EPBaseAPIViewSet):
     lookup_url_kwarg = "slug"
 
     def get_queryset(self):
-        return self.model.objects.all().order_by("-id")
+        return self.model.objects.filter(live=True).order_by("-id")
 
     def pinnedpost_list(self, request):
-        queryset = self.model.objects.filter(is_pinned=True)
+        queryset = self.get_queryset().filter(is_pinned=True)
         self.check_query_parameters(queryset)
         queryset = self.filter_queryset(queryset)
         queryset = self.paginate_queryset(queryset)
-        serializer = self.base_serializer_class(queryset, many=True)
+        serializer = self.base_serializer_class(queryset, many=True,  context=self.get_serializer_context())
         return self.get_paginated_response(serializer.data)
 
     def popularpost_list(self, request):
-        queryset = self.model.objects.all().order_by("-view_count")
+        queryset = self.get_queryset().order_by("-view_count")
         if queryset.count() > 4:
             queryset = queryset[:4]
         self.check_query_parameters(queryset)
@@ -355,8 +355,8 @@ class BlogAPIViewSet(EPBaseAPIViewSet):
     
     def detail_view(self, request, pk=None, slug=None):
         if slug:
-            pk = self.model.objects.get(slug=slug).id
-        self.model.objects.filter(id=pk).update(view_count=F('view_count')+1)
+            pk = self.model.objects.get(slug=slug, live=True).id
+        self.get_queryset().filter(id=pk).update(view_count=F('view_count')+1)
         return super().detail_view(request, pk)
     
     @classmethod
